@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA Model — ระบบประเมินและรายงานผลโครงการโอลิมปิก</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --navy-deep: #070d21;
+    --navy-panel: #111f45;
+    --line: rgba(150,178,255,0.14);
+    --white: #f5f7fb;
+    --mist: #aab6d8;
+    --mist-dim: #6c7aa3;
+    --blue: #4c8dff;
+    --cyan: #7fd8ff;
+    --violet: #a58bff;
+    --gold: #ffc857;
+    --silver: #c9d3e0;
+    --bronze: #d68b52;
+    --good: #5fe0a8;
+    --bad: #ff6b6b;
+    --radius: 18px;
+    --shadow-blue: rgba(76,141,255,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { 
+    background: var(--navy-deep); 
+    color: var(--white); 
+    font-family: 'Inter', sans-serif; 
+    overflow-x: hidden; 
+    scroll-behavior: smooth;
+  }
+  body { position: relative; min-height: 100vh; }
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+  #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .hidden { display: none !important; }
+
+  /* ============ COMMON UTILITIES ============ */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue), #2a5fd6);
+    color: #fff;
+    box-shadow: 0 10px 25px var(--shadow-blue);
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(76,141,255,0.4);
+    filter: brightness(1.1);
+  }
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    color: var(--mist);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: var(--cyan);
+  }
+
+  /* ============ LOGIN SCREEN ============ */
+  #loginScreen { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+  .login-card { width: 100%; max-width: 440px; position: relative; background: linear-gradient(180deg, rgba(76,141,255,0.12), rgba(10,17,45,0.75)); border: 1px solid var(--line); border-radius: 24px; padding: 40px 36px 32px; backdrop-filter: blur(14px); box-shadow: 0 30px 80px rgba(0,0,10,0.6); margin-bottom: 20px; }
+  .login-brand { display: flex; align-items: center; gap: 14px; justify-content: center; margin-bottom: 6px; }
+  .login-brand .mark { width: 52px; height: 52px; filter: drop-shadow(0 0 16px rgba(127,216,255,0.75)); }
+  .login-brand .mark svg { width: 100%; height: 100%; display: block; }
+  .login-brand .name { font-size: 24px; font-weight: 700; letter-spacing: 0.5px; }
+  .login-brand .name span { color: var(--cyan); }
+  .login-sub { text-align: center; font-size: 11px; color: var(--mist-dim); letter-spacing: 1.6px; text-transform: uppercase; margin-bottom: 28px; }
+  
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 11.5px; color: var(--mist-dim); margin-bottom: 7px; letter-spacing: 0.6px; text-transform: uppercase; }
+  .field .input-wrap { position: relative; }
+  .field input { width: 100%; padding: 13px 14px 13px 42px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--white); font-family: 'IBM Plex Mono'; font-size: 14px; outline: none; transition: all .25s; }
+  .field input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(127,216,255,0.15); background: rgba(255,255,255,0.08); }
+  .field .icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; stroke: var(--mist-dim); transition: stroke 0.25s; }
+  .field input:focus + .icon { stroke: var(--cyan); }
+  .login-btn { width: 100%; padding: 14px; border-radius: 12px; font-family: 'Space Grotesk'; font-weight: 700; font-size: 15px; margin-top: 8px; }
+  .error-msg { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--bad); background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.25); padding: 10px 14px; border-radius: 10px; margin-bottom: 16px; animation: shake 0.4s ease; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  .db-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background: rgba(95,224,168,0.1);
+    border: 1px solid rgba(95,224,168,0.25);
+    color: var(--good);
+    align-self: center;
+  }
+  .db-status-badge.loading {
+    background: rgba(255,200,87,0.1);
+    border-color: rgba(255,200,87,0.25);
+    color: var(--gold);
+  }
+
+  /* ============ APP ============ */
+  #app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 20px 26px; border-radius: var(--radius); background: linear-gradient(135deg, rgba(76,141,255,0.14), rgba(10,17,45,0.5)); border: 1px solid var(--line); margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(8px); }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand .mark { width: 44px; height: 44px; filter: drop-shadow(0 0 12px rgba(127,216,255,0.65)); }
+  .brand .mark svg { width: 100%; height: 100%; display: block; }
+  .brand .name { font-size: 20px; font-weight: 700; }
+  .brand .name span { color: var(--cyan); }
+  .brand .tagline { font-size: 10px; color: var(--mist-dim); letter-spacing: 1.8px; text-transform: uppercase; margin-top: 1px; }
+  
+  .header-actions { display: flex; align-items: center; gap: 14px; }
+  .profile-pill { display: flex; align-items: center; gap: 12px; padding: 6px 18px 6px 6px; border-radius: 40px; background: rgba(255,255,255,0.04); border: 1px solid var(--line); }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#203370,#0a1230); border: 2.5px solid var(--cyan); display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-weight: 700; font-size: 14px; color: var(--cyan); box-shadow: 0 0 10px rgba(127,216,255,0.3); }
+  .profile-pill .pname { font-size: 14px; font-weight: 600; color: var(--white); }
+  .profile-pill .pmeta { font-size: 11px; color: var(--mist-dim); font-family: 'IBM Plex Mono'; margin-top: 2px; }
+  .logout-btn { display: flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+  .logout-btn:hover { border-color: rgba(255,107,107,0.4); color: var(--bad); }
+
+  /* Welcome Banner */
+  .welcome-banner { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; padding: 28px 32px; border-radius: var(--radius); background: radial-gradient(1100px 300px at 10% -20%, rgba(76,141,255,0.22), transparent 70%), var(--navy-panel); border: 1px solid var(--line); margin-bottom: 26px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+  .welcome-banner h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
+  .welcome-banner h1 b { color: var(--cyan); }
+  .welcome-banner p { color: var(--mist-dim); font-size: 13.5px; margin-top: 6px; }
+  
+  .stats-combo { display: flex; gap: 16px; flex-wrap: wrap; }
+  .avg-badge { display: flex; align-items: center; gap: 14px; padding: 12px 22px; border-radius: 16px; background: linear-gradient(135deg, rgba(255,200,87,0.15), rgba(255,200,87,0.02)); border: 1px solid rgba(255,200,87,0.4); box-shadow: 0 8px 24px rgba(255,200,87,0.05); }
+  .avg-badge.blue-theme { background: linear-gradient(135deg, rgba(76,141,255,0.15), rgba(76,141,255,0.02)); border-color: rgba(76,141,255,0.4); }
+  .avg-badge .num { font-family: 'Space Grotesk'; font-size: 28px; font-weight: 700; color: var(--gold); }
+  .avg-badge.blue-theme .num { color: var(--cyan); }
+  .avg-badge .lbl { font-size: 10px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; margin-top: 2px; }
+
+  /* Sections header styles */
+  .section-label { display: flex; align-items: center; gap: 11px; margin: 30px 2px 18px; flex-wrap: wrap; }
+  .section-label .idx { font-family: 'IBM Plex Mono'; font-size: 11px; color: var(--cyan); border: 1px solid rgba(127,216,255,0.35); border-radius: 6px; padding: 2px 8px; font-weight: bold; background: rgba(127,216,255,0.05); }
+  .section-label h2 { font-size: 18px; font-weight: 600; color: var(--white); }
+  .section-label .sub { font-size: 12.5px; color: var(--mist-dim); margin-left: auto; }
+
+  /* Orbit subject selector (Fixed Top Clipping Issue) */
+  .orbit-panel { 
+    position: relative; 
+    border-radius: var(--radius); 
+    background: var(--navy-panel); 
+    border: 1px solid var(--line); 
+    margin-bottom: 26px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+    
+    /* Move scrolling capability to the outer panel to prevent top clipping */
+    overflow-x: auto; 
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .orbit-panel::before { 
+    content: ""; position: absolute; inset: 0; 
+    background: radial-gradient(600px 250px at 50% -30%, rgba(76,141,255,0.18), transparent 70%); 
+    pointer-events: none; border-radius: var(--radius); 
+  }
+  
+  /* Scrollbar styling attached to panel */
+  .orbit-panel::-webkit-scrollbar { height: 6px; }
+  .orbit-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; margin: 0 16px; }
+  .orbit-panel::-webkit-scrollbar-thumb { background: rgba(127,216,255,0.2); border-radius: 10px; }
+  .orbit-panel::-webkit-scrollbar-thumb:hover { background: rgba(127,216,255,0.4); }
+
+  .orbit-track { 
+    position: relative; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-start; 
+    /* Generous top padding (36px) guarantees the glow & scale won't get cut */
+    padding: 36px 24px 24px; 
+    gap: 10px; 
+    min-width: 860px; /* Forces flex layout to stretch out properly */
+  }
+  
+  .orbit-line { 
+    position: absolute; left: 6%; right: 6%; 
+    /* 36px padding + 30px (half of 60px circle) = 66px */
+    top: 66px; 
+    height: 2px; background: repeating-linear-gradient(90deg, rgba(127,216,255,0.3) 0 8px, transparent 8px 16px); z-index: 0; 
+  }
+  
+  .subject-node { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 0 0 114px; cursor: pointer; background: none; border: none; color: inherit; font-family: inherit; transition: all 0.25s; }
+  .subject-node .orb { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(160deg, #162452, #080f2b); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: inset 0 2px 6px rgba(255,255,255,0.05); }
+  .subject-node .orb svg { width: 26px; height: 26px; stroke: var(--mist); fill: none; transition: all .3s; }
+  .subject-node .lbl { font-size: 11px; color: var(--mist-dim); text-align: center; line-height: 1.35; transition: color .25s; font-weight: 500; height: 28px; display: flex; align-items: center; justify-content: center; }
+  
+  .subject-node.active .orb { background: radial-gradient(circle at 35% 25%, #d6eaff, var(--blue) 55%, #122c80 100%); border-color: rgba(127,216,255,0.85); box-shadow: 0 0 24px rgba(76,141,255,0.65), inset 0 2px 4px rgba(255,255,255,0.4); transform: scale(1.1); }
+  .subject-node.active .orb svg { stroke: #04091a; stroke-width: 2.4; filter: drop-shadow(0 1px 1px rgba(255,255,255,0.4)); }
+  .subject-node.active .lbl { color: var(--cyan); font-weight: 700; text-shadow: 0 0 8px rgba(127,216,255,0.3); }
+  .subject-node:hover:not(.active) .orb { border-color: rgba(127,216,255,0.45); transform: translateY(-3px); background: #1a2c66; }
+  .subject-node:hover:not(.active) .lbl { color: var(--white); }
+  .subject-node .data-dot { position: absolute; top: -1px; right: 24px; width: 10px; height: 10px; border-radius: 50%; background: var(--good); box-shadow: 0 0 8px var(--good); border: 2px solid var(--navy-panel); }
+
+  /* Mission Map Canvas / SVG section */
+  .mission-panel { border-radius: var(--radius); background: linear-gradient(180deg, #0e1c45, #080f26); border: 1px solid var(--line); padding: 26px; margin-bottom: 26px; position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.25); }
+  .mission-panel .glow { position: absolute; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(76,141,255,0.16), transparent 70%); top: -180px; right: -120px; pointer-events: none; }
+  .mission-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; position: relative; flex-wrap: wrap; gap: 10px; }
+  .mission-head h2 { font-size: 17px; font-weight: 600; letter-spacing: 0.5px; }
+  .mission-head .current-subject { font-family: 'IBM Plex Mono'; font-size: 11px; color: var(--cyan); background: rgba(127,216,255,0.1); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(127,216,255,0.2); }
+  .mission-svg-wrap { position: relative; margin-top: 18px; background: rgba(5, 10, 28, 0.4); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.03); }
+  .stage-caption { display: flex; justify-content: space-between; margin-top: 14px; position: relative; height: 45px; }
+  .stage-caption > div { position: absolute; text-align: center; width: 120px; transform: translateX(-50%); }
+  .stage-caption .sname { font-family: 'Space Grotesk'; font-size: 14.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--white); }
+  .stage-caption .stype { font-size: 10px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+
+  /* Scorecards & Details grid */
+  .cards-row { display: grid; grid-template-columns: repeat(3, 1fr) 280px; gap: 20px; margin-bottom: 30px; }
+  .stage-card { border-radius: 18px; background: var(--navy-panel); border: 1px solid var(--line); padding: 22px; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  .stage-card:hover { transform: translateY(-4px); border-color: rgba(127,216,255,0.25); box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
+  .stage-card.empty { opacity: 0.5; }
+  .stage-card .top-row { display: flex; align-items: center; justify-content: space-between; }
+  .stage-card .stage-tag { display: flex; align-items: center; gap: 10px; }
+  .stage-card .stage-tag .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .stage-card .stage-name { font-family: 'Space Grotesk'; font-size: 16px; font-weight: 700; color: #fff; }
+  .stage-card .stage-type { font-size: 10px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 1px; }
+  .stage-card .status-pill { font-size: 9.5px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--line); color: var(--mist-dim); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; background: rgba(0,0,0,0.15); }
+  .stage-card.completed .status-pill { color: var(--good); border-color: rgba(95,224,168,0.2); background: rgba(95,224,168,0.05); }
+  
+  .stage-card .score-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 8px; }
+  .stage-card .score { font-family: 'Space Grotesk'; font-size: 38px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+  .stage-card .score.empty-txt { font-size: 14px; color: var(--mist-dim); font-family: 'Inter'; font-weight: 500; letter-spacing: 0; }
+  .stage-card .score-lbl { font-size: 11.5px; color: var(--mist-dim); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+  .medal-wrap { width: 56px; height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  
+  .stage-card .footer-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--line); }
+  .stage-card .footer-row .lvl { font-size: 11px; color: var(--mist); display: flex; align-items: center; gap: 5px; }
+
+  /* Summary panel details */
+  .summary-panel { border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px; background: linear-gradient(160deg,#142456,#080f2b); border: 1px solid var(--line); box-shadow: inset 0 0 20px rgba(76,141,255,0.05); }
+  .summary-panel h3 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--white); text-transform: uppercase; letter-spacing: 0.8px; }
+  .summary-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .summary-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .summary-item .l { font-size: 12px; color: var(--mist-dim); }
+  .summary-item .v { font-family: 'Space Grotesk'; font-size: 16px; font-weight: 700; }
+  .summary-item .v.good { color: var(--good); }
+  .summary-item .v.gold { color: var(--gold); }
+
+  /* Export block */
+  .export-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, rgba(76,141,255,0.06), rgba(127,216,255,0.06));
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-top: 26px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .export-info h3 { font-size: 15px; font-weight: 600; color: var(--white); }
+  .export-info p { font-size: 12px; color: var(--mist-dim); margin-top: 3px; }
+  .export-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-family: 'Space Grotesk'; font-weight: 600; }
+
+  /* Modal for errors/alerts */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .modal-overlay.active { opacity: 1; pointer-events: auto; }
+  .modal-box { background: var(--navy-panel); border: 1px solid var(--line); border-radius: 20px; padding: 30px; max-width: 400px; width: 90%; text-align: center; transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+  .modal-overlay.active .modal-box { transform: translateY(0); }
+  .modal-icon { font-size: 40px; color: var(--gold); margin-bottom: 16px; }
+  .modal-title { font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 10px; font-family: 'Space Grotesk'; }
+  .modal-text { font-size: 14px; color: var(--mist); line-height: 1.5; margin-bottom: 24px; }
+  .modal-close { padding: 10px 24px; border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .modal-close:hover { background: rgba(255,255,255,0.2); }
+
+  /* Print Styles used by the new window */
+  .print-only-style { display: none; }
+
+  /* Responsive Adjustments */
+  @media (max-width: 1080px) {
+    .cards-row { grid-template-columns: repeat(3, 1fr); }
+    .summary-panel { grid-column: span 3; }
+  }
+  @media (max-width: 860px) {
+    #app { padding: 18px 14px 40px; }
+    header.top { flex-wrap: wrap; gap: 14px; padding: 16px 20px; }
+    .header-actions { width: 100%; justify-content: space-between; }
+    .welcome-banner { grid-template-columns: 1fr; padding: 22px 24px; }
+    .stats-combo { width: 100%; justify-content: flex-start; }
+    
+    .orbit-track { min-width: 700px; padding: 32px 16px 24px; }
+    .orbit-line { top: 57px; } /* 32px padding + 25px (half of 50px orb) */
+    
+    .subject-node { flex: 0 0 90px; }
+    .subject-node .orb { width: 50px; height: 50px; }
+    .subject-node .orb svg { width: 22px; height: 22px; }
+    
+    .stage-caption .sname { font-size: 12px; }
+    .stage-caption .stype { font-size: 8px; }
+  }
+  @media (max-width: 640px) {
+    .cards-row { grid-template-columns: 1fr; }
+    .summary-panel { grid-column: span 1; }
+    .export-section { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="mark"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="novaGradA" cx="42%" cy="38%" r="65%">
+          <stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#bfe4ff"/><stop offset="65%" stop-color="#4c8dff"/><stop offset="100%" stop-color="#122a63"/>
+        </radialGradient></defs>
+        <circle cx="24" cy="24" r="15" fill="url(#novaGradA)"/>
+        <g stroke="#eaf6ff" stroke-width="1.6" stroke-linecap="round" opacity="0.9">
+          <line x1="24" y1="1" x2="24" y2="9"/><line x1="24" y1="39" x2="24" y2="47"/>
+          <line x1="1" y1="24" x2="9" y2="24"/><line x1="39" y1="24" x2="47" y2="24"/>
+        </g>
+        <g stroke="#9fd8ff" stroke-width="1" stroke-linecap="round" opacity="0.6">
+          <line x1="9" y1="9" x2="13.5" y2="13.5"/><line x1="39" y1="9" x2="34.5" y2="13.5"/>
+          <line x1="9" y1="39" x2="13.5" y2="34.5"/><line x1="39" y1="39" x2="34.5" y2="34.5"/>
+        </g>
+        <path d="M24 10 L27 20 L37 24 L27 28 L24 38 L21 28 L11 24 L21 20 Z" fill="#ffffff" opacity="0.92"/>
+      </svg></div>
+      <div class="name">NOVA <span>Model</span></div>
+    </div>
+    <div class="login-sub">Olympiad Program · เข้าสู่ระบบ</div>
+
+    <div id="errorBox" class="error-msg hidden">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่</span>
+    </div>
+
+    <div class="field">
+      <label>รหัสผู้ใช้ (Login)</label>
+      <div class="input-wrap">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/></svg>
+        <input id="loginInput" type="text" placeholder="รหัสประจำตัวนักเรียน" autocomplete="username">
+      </div>
+    </div>
+    <div class="field">
+      <label>รหัสผ่าน (Password)</label>
+      <div class="input-wrap">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="9" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <input id="passInput" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+    </div>
+
+    <button class="login-btn btn-primary" id="loginBtn">เข้าสู่ระบบเพื่อดูผลประเมิน</button>
+    
+    <div style="margin-top: 24px; text-align: center;">
+      <span id="dbStatusBadge" class="db-status-badge loading">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span id="dbStatusText">กำลังเชื่อมต่อฐานข้อมูล...</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP / DASHBOARD ============ -->
+<div id="app" class="hidden">
+  <header class="top">
+    <div class="brand">
+      <div class="mark"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="novaGradB" cx="42%" cy="38%" r="65%">
+          <stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#bfe4ff"/><stop offset="65%" stop-color="#4c8dff"/><stop offset="100%" stop-color="#122a63"/>
+        </radialGradient></defs>
+        <circle cx="24" cy="24" r="15" fill="url(#novaGradB)"/>
+        <g stroke="#eaf6ff" stroke-width="1.6" stroke-linecap="round" opacity="0.9">
+          <line x1="24" y1="1" x2="24" y2="9"/><line x1="24" y1="39" x2="24" y2="47"/>
+          <line x1="1" y1="24" x2="9" y2="24"/><line x1="39" y1="24" x2="47" y2="24"/>
+        </g>
+        <g stroke="#9fd8ff" stroke-width="1" stroke-linecap="round" opacity="0.6">
+          <line x1="9" y1="9" x2="13.5" y2="13.5"/><line x1="39" y1="9" x2="34.5" y2="13.5"/>
+          <line x1="9" y1="39" x2="13.5" y2="34.5"/><line x1="39" y1="39" x2="34.5" y2="34.5"/>
+        </g>
+        <path d="M24 10 L27 20 L37 24 L27 28 L24 38 L21 28 L11 24 L21 20 Z" fill="#ffffff" opacity="0.92"/>
+      </svg></div>
+      <div>
+        <div class="name">NOVA <span>Model</span></div>
+        <div class="tagline">Olympiad Program</div>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <div class="profile-pill">
+        <div class="avatar" id="pAvatar">--</div>
+        <div>
+          <div class="pname" id="pName">-</div>
+          <div class="pmeta" id="pMeta">-</div>
+        </div>
+      </div>
+      <button class="logout-btn btn-secondary" id="logoutBtn">
+        <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+      </button>
+    </div>
+  </header>
+
+  <div class="welcome-banner">
+    <div>
+      <h1>ยินดีต้อนรับกลับ, <b id="wName">-</b> ✨</h1>
+      <p id="wSub">ผลคะแนนล่าสุดของคุณในโครงการโอลิมปิก NOVA Model</p>
+    </div>
+    <div class="stats-combo">
+      <div class="avg-badge blue-theme">
+        <div>
+          <div class="num" id="testedSubjectsCount">0</div>
+          <div class="lbl">วิชาที่ทำการสอบ</div>
+        </div>
+      </div>
+      <div class="avg-badge">
+        <div>
+          <div class="num" id="avgScore">0%</div>
+          <div class="lbl">คะแนนเฉลี่ยรวม</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">
+    <span class="idx">01</span>
+    <h2>เลือกวิชา / แผนการทดสอบ</h2>
+    <span class="sub">จุดสีเขียวหมายถึงมีคะแนนบันทึกไว้แล้ว (เลื่อนซ้ายขวาได้)</span>
+  </div>
+  <div class="orbit-panel">
+    <div class="orbit-track" id="orbitTrack">
+      <!-- Subjects will be injected here -->
+    </div>
+  </div>
+
+  <div class="section-label">
+    <span class="idx">02</span>
+    <h2>ความคืบหน้าภารกิจรายวิชา</h2>
+    <span class="sub" id="currentSubjectLabel">-</span>
+  </div>
+
+  <div class="mission-panel" id="printArea">
+    <div class="glow"></div>
+    <div class="mission-head">
+      <h2>Spark → Flare → SuperNOVA</h2>
+      <div class="current-subject" id="missionSubjectTag">-</div>
+    </div>
+    <div class="mission-svg-wrap" id="missionSvgWrap"></div>
+    <div class="stage-caption" id="stageCaptionWrap">
+      <!-- Captions injected dynamically to match graph width -->
+    </div>
+  </div>
+
+  <div class="cards-row" id="cardsRow"></div>
+
+  <!-- Export Banner -->
+  <div class="export-section">
+    <div class="export-info">
+      <h3>ระบบรายงานผลคะแนนเพื่อพัฒนาศักยภาพของนักเรียน</h3>
+      <p>คุณสามารถบันทึกหรือพิมพ์รายงานผลคะแนนปัจจุบันเพื่อใช้ประกอบการประเมินส่วนตัวได้</p>
+    </div>
+    <button class="export-btn btn-secondary" id="exportBtn">
+      <i class="fa-solid fa-print"></i> จัดพิมพ์รายงาน
+    </button>
+  </div>
+</div>
+
+<!-- Modal Alert -->
+<div class="modal-overlay" id="alertModal">
+  <div class="modal-box">
+    <i class="fa-solid fa-triangle-exclamation modal-icon"></i>
+    <div class="modal-title">ไม่สามารถเปิดหน้าต่างพิมพ์ได้</div>
+    <div class="modal-text">เบราว์เซอร์ของคุณอาจบล็อกการเปิดแท็บใหม่ (Pop-up Blocker) กรุณาอนุญาตให้เว็บไซต์นี้เปิดป็อปอัปได้ หรือบันทึกไฟล์นี้ไปเปิดในเบราว์เซอร์ปกติโดยตรง</div>
+    <button class="modal-close" onclick="document.getElementById('alertModal').classList.remove('active')">ตกลง เข้าใจแล้ว</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Starfield Animation Background ---------- */
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+const stars = Array.from({length:400}, () => ({
+  x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight,
+  r: Math.random()*1.0+0.1, a: Math.random()*0.6+0.2, tw: Math.random()*0.02+0.005
+}));
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#070d21'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.a += s.tw; if(s.a>0.9||s.a<0.15) s.tw*=-1;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(200,220,255,${s.a})`; ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+/* ---------- Subject Definitions & SVGs ---------- */
+const icons = {
+  physics: '<circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>',
+  biology: '<path d="M6 4c0 8 12 8 12 16M18 4c0 8-12 8-12 16"/><path d="M7 8h3M14 8h3M6.3 12h3.4M14.3 12h3.4M7.5 16h3M13.5 16h3"/>',
+  computer: '<rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M9 19h6M12 15v4"/><rect x="9" y="8" width="6" height="4" rx="0.5"/>',
+  chemistry: '<path d="M9 3h6M10 3v5.2L5.5 17a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3L14 8.2V3"/><path d="M7.5 14h9"/>',
+  mathematics: '<path d="M6 8c2 4 2 4 0 8M18 8c-2 4-2 4 0 8" stroke-width="2"/>',
+  juniorAstro: '<path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/>',
+  seniorAstro: '<circle cx="10" cy="12" r="5.5"/><path d="M4.5 12h11M10 6.5v11"/><circle cx="18" cy="8" r="1.4" fill="currentColor" stroke="none"/>'
+};
+
+const SUBJECTS = [
+  { id:'physics', name:'ฟิสิกส์', icon: icons.physics },
+  { id:'biology', name:'ชีววิทยา', icon: icons.biology },
+  { id:'computer', name:'คอมพิวเตอร์', icon: icons.computer },
+  { id:'chemistry', name:'เคมี', icon: icons.chemistry },
+  { id:'mathematics', name:'คณิตศาสตร์', icon: icons.mathematics },
+  { id:'juniorAstro', name:'ดาราศาสตร์ ม.ต้น', icon: icons.juniorAstro },
+  { id:'seniorAstro', name:'ดาราศาสตร์ ม.ปลาย', icon: icons.seniorAstro },
+];
+
+/* ---------- Local Sandbox Data ---------- */
+const LOCAL_FALLBACK_STUDENTS = [
+  {
+    login: "50914",
+    password: "password",
+    name: "สัณหณัฐ จอมทอง",
+    class: "ม.5/1",
+    no: "1",
+    scores: {
+      physics: { spark: 90, flare: 88, super: 95 },
+      biology: { spark: 75, flare: 65, super: 85 },
+      chemistry: { spark: 60, flare: null, super: 72 },
+      mathematics: { spark: 88, flare: 91, super: 89 }
+    }
+  },
+  {
+    login: "50915",
+    password: "password",
+    name: "มนัสชนก ไตรสิทธิ์",
+    class: "ม.5/3",
+    no: "14",
+    scores: {
+      biology: { spark: 95, flare: 92, super: 98 },
+      computer: { spark: 82, flare: 86, super: 89 },
+      chemistry: { spark: 74, flare: 70, super: 78 }
+    }
+  },
+  {
+    login: "50916",
+    password: "password",
+    name: "วิทวัส แสนศักดิ์",
+    class: "ม.4/1",
+    no: "8",
+    scores: {
+      juniorAstro: { spark: 88, flare: 84, super: 91 },
+      mathematics: { spark: 70, flare: 75, super: null }
+    }
+  },
+  {
+    login: "50917",
+    password: "password",
+    name: "เกศินี ปัญญาพูน",
+    class: "ม.6/2",
+    no: "22",
+    scores: {
+      seniorAstro: { spark: 92, flare: 96, super: 95 },
+      physics: { spark: 84, flare: 80, super: 88 },
+      computer: { spark: 90, flare: 95, super: 92 }
+    }
+  }
+];
+
+let STUDENTS = [];
+const API_URL = "https://script.google.com/macros/s/AKfycbwIsD3x0UeFNgUyJaNqPdrRIVVHh5wUvNgMxRfbESo1pGF9KTg6DXk1ppQxM9zWPtjYaw/exec";
+
+async function loadStudents(){
+  const statusBadge = document.getElementById('dbStatusBadge');
+  const statusText = document.getElementById('dbStatusText');
+  
+  // 1. ตรวจสอบว่ามีข้อมูลถูกเก็บไว้ชั่วคราว (Session Cache) หรือไม่
+  const cachedData = sessionStorage.getItem('nova_students_cache');
+  if (cachedData) {
+    try {
+      STUDENTS = JSON.parse(cachedData);
+      statusBadge.className = "db-status-badge";
+      statusText.innerText = "เชื่อมต่อฐานข้อมูลสำเร็จ (Cached)";
+      statusBadge.style.background = "rgba(95,224,168,0.15)";
+      statusBadge.style.color = "var(--good)";
+      return; // ไม่ต้องโหลด API ใหม่
+    } catch(e) {
+      console.warn("Cache parsing error", e);
+    }
+  }
+
+  // 2. ถ้าไม่มี Cache ให้โหลดจาก Google API (ปรับเพิ่มเวลา Timeout เป็น 10 วิ)
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); 
+    
+    const res = await fetch(API_URL, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    if(!res.ok) throw new Error("Load failed");
+    STUDENTS = await res.json();
+    
+    // บันทึกข้อมูลลง Cache เพื่อใช้ในกรณีที่มีการรีเฟรชหน้าเว็บ
+    sessionStorage.setItem('nova_students_cache', JSON.stringify(STUDENTS));
+    
+    statusBadge.className = "db-status-badge";
+    statusText.innerText = "เชื่อมต่อคลาวด์ API สำเร็จ";
+    statusBadge.style.background = "rgba(95,224,168,0.15)";
+    statusBadge.style.color = "var(--good)";
+  } catch(e) {
+    console.warn("Could not load from Google Script, applying local fallback:", e);
+    STUDENTS = LOCAL_FALLBACK_STUDENTS;
+    statusBadge.className = "db-status-badge";
+    statusText.innerText = "Sandbox Mode (ออฟไลน์)";
+    statusBadge.style.background = "rgba(127,216,255,0.1)";
+    statusBadge.style.color = "var(--cyan)";
+    statusBadge.style.borderColor = "rgba(127,216,255,0.3)";
+  }
+}
+
+let currentStudent = null;
+let activeSubjectId = null;
+
+/* ---------- login ---------- */
+function tryLogin(){
+  const loginVal = document.getElementById('loginInput').value.trim();
+  const passVal = document.getElementById('passInput').value.trim();
+  const found = STUDENTS.find(s => s.login === loginVal && s.password === passVal);
+  const errorBox = document.getElementById('errorBox');
+  if(!found){ errorBox.classList.remove('hidden'); return; }
+  errorBox.classList.add('hidden');
+  currentStudent = found;
+  
+  const activeKeys = Object.keys(found.scores);
+  activeSubjectId = activeKeys.length > 0 ? activeKeys[0] : 'physics';
+  
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  renderAll();
+}
+
+/* ---------- event binds ---------- */
+document.getElementById('loginBtn').addEventListener('click', tryLogin);
+document.getElementById('passInput').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+document.getElementById('loginInput').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  currentStudent = null;
+  document.getElementById('loginInput').value = '';
+  document.getElementById('passInput').value = '';
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+});
+window.addEventListener('resize', () => {
+  if (currentStudent && activeSubjectId) {
+    // Redraw graph dynamically on resize
+    const subjData = currentStudent.scores[activeSubjectId] || null;
+    drawResponsiveMission(subjData);
+  }
+});
+
+/* ---------- medal helpers ---------- */
+function medalType(score){
+  if(score == null) return 'empty';
+  if(score >= 80) return 'gold';    // Changed to 80-100
+  if(score >= 70) return 'silver';  // Remains 70-79
+  if(score >= 60) return 'bronze';  // Changed to 60-69
+  return 'none';
+}
+
+function medalSvg(type, size){
+  size = size || 56;
+  const palette = { 
+    gold:['#ffe9b0','#ffc857','#b3791f'], 
+    silver:['#f1f4f9','#c9d3e0','#7c8aa3'], 
+    bronze:['#f3caa3','#d68b52','#8a4c22'] 
+  };
+  if(palette[type]){
+    const [c1,c2,c3] = palette[type];
+    const uid = type + Math.random().toString(36).slice(2,7);
+    return `<svg viewBox="0 0 56 56" width="${size}" height="${size}">
+      <defs>
+        <radialGradient id="g-${uid}" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="${c1}"/>
+          <stop offset="55%" stop-color="${c2}"/>
+          <stop offset="100%" stop-color="${c3}"/>
+        </radialGradient>
+      </defs>
+      <path d="M20 26 L14 42 L28 36 L42 42 L36 26" fill="${c2}" opacity="0.6"/>
+      <circle cx="28" cy="23" r="15" fill="url(#g-${uid})" stroke="${c3}" stroke-width="1.2"/>
+      <path d="M28 14 l2.4 5 5.6.5 -4.2 3.8 1.2 5.5 -4.9-2.9 -4.9 2.9 1.2-5.5 -4.2-3.8 5.6-.5z" fill="${c3}" opacity="0.95"/>
+    </svg>`;
+  }
+  if(type === 'empty'){
+    return `<svg viewBox="0 0 56 56" width="${size}" height="${size}"><circle cx="28" cy="24" r="15" fill="none" stroke="#3a4a78" stroke-width="1.6" stroke-dasharray="3 4"/><path d="M22 24h12" stroke="#5a6a94" stroke-width="2" stroke-linecap="round"/></svg>`;
+  }
+  return `<svg viewBox="0 0 56 56" width="${size}" height="${size}"><circle cx="28" cy="24" r="15" fill="#16234c" stroke="#3a4a78" stroke-width="1.5"/><circle cx="28" cy="24" r="5" fill="#4c8dff" opacity="0.8"/></svg>`;
+}
+
+/* ---------- orbit selector ---------- */
+function renderOrbit(){
+  const track = document.getElementById('orbitTrack');
+  track.innerHTML = '<div class="orbit-line"></div>' + SUBJECTS.map(s => {
+    const hasData = !!(currentStudent.scores[s.id] && (currentStudent.scores[s.id].spark !== null || currentStudent.scores[s.id].flare !== null || currentStudent.scores[s.id].super !== null));
+    return `
+    <button class="subject-node ${s.id===activeSubjectId?'active':''}" data-id="${s.id}">
+      ${hasData ? '<span class="data-dot"></span>' : ''}
+      <div class="orb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${s.icon}</svg>
+      </div>
+      <div class="lbl">${s.name}</div>
+    </button>`;
+  }).join('');
+  track.querySelectorAll('.subject-node').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ 
+      activeSubjectId = btn.dataset.id; 
+      renderAll(); 
+      // Auto center clicked item slightly
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+  });
+}
+
+/* ---------- dynamic mission map & captions ---------- */
+function drawResponsiveMission(subjData) {
+  const wrap = document.getElementById('missionSvgWrap');
+  const captionWrap = document.getElementById('stageCaptionWrap');
+  
+  // Calculate dynamic width
+  const totalWidth = wrap.clientWidth || 800;
+  
+  // Points positions dynamically calculated based on width container
+  const pts = [
+    { key:'spark', x: totalWidth * 0.15, score: subjData ? subjData.spark : null },
+    { key:'flare', x: totalWidth * 0.50, score: subjData ? subjData.flare : null },
+    { key:'super', x: totalWidth * 0.85, score: subjData ? subjData.super : null },
+  ];
+  const yFor = (score) => score==null ? 135 : 175 - (score/100)*120;
+  pts.forEach(p => p.y = yFor(p.score));
+  
+  const path = `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y}`;
+
+  const dotsAndLabels = pts.map(p=>{
+    const has = p.score != null;
+    return `<g>
+      ${has ? `
+      <path d="M${p.x} 205 L${p.x} ${p.y}" stroke="rgba(127,216,255,0.15)" stroke-width="1" stroke-dasharray="3 3"/>
+      <circle cx="${p.x}" cy="${p.y}" r="8" fill="#7fd8ff" stroke="#080f26" stroke-width="3"/>
+      <circle cx="${p.x}" cy="${p.y}" r="14" fill="none" stroke="#7fd8ff" stroke-width="1" opacity="0.35"/>` :
+      `<circle cx="${p.x}" cy="135" r="6" fill="none" stroke="#3a4a78" stroke-width="1.5" stroke-dasharray="2 3"/>`}
+      <text x="${p.x}" y="${(has?p.y:135) - 22}" text-anchor="middle" fill="#f5f7fb" font-family="Space Grotesk" font-weight="700" font-size="19">${has ? p.score+'%' : '—'}</text>
+    </g>`;
+  }).join('');
+
+  const hasAny = pts.some(p=>p.score!=null);
+  
+  wrap.innerHTML = `
+  <svg width="100%" height="230" style="overflow:visible; display:block;">
+    <line x1="30" y1="205" x2="${totalWidth-30}" y2="205" stroke="#22305c" stroke-width="1.5"/>
+    ${hasAny ? `<path d="${path}" fill="none" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+    ${dotsAndLabels}
+  </svg>`;
+
+  // Render Captions matching the exact X positions
+  captionWrap.innerHTML = `
+    <div style="left: ${pts[0].x}px;"><div class="sname"><i class="fa-solid fa-star" style="color:var(--cyan); font-size:12px;"></i> Spark</div><div class="stype">Placement Test</div></div>
+    <div style="left: ${pts[1].x}px;"><div class="sname"><i class="fa-solid fa-bolt" style="color:var(--violet); font-size:12px;"></i> Flare</div><div class="stype">Mock Test</div></div>
+    <div style="left: ${pts[2].x}px;"><div class="sname"><i class="fa-solid fa-circle-nodes" style="color:var(--gold); font-size:12px;"></i> SuperNOVA</div><div class="stype">Final Simulation</div></div>
+  `;
+}
+
+/* ---------- stage card ---------- */
+function scoreCard(label, type, score){
+  const has = score != null;
+  const mType = medalType(score);
+  const dotColor = type==='spark' ? 'var(--cyan)' : type==='flare' ? 'var(--violet)' : 'var(--gold)';
+  
+  let desc = 'ยังไม่ทำ';
+  if(has) {
+    if(score >= 80) desc = 'ดีเยี่ยม (Excellent)';      // Updated to match gold criteria (80)
+    else if(score >= 70) desc = 'ดีมาก (Proficient)';   // Matches silver criteria (70)
+    else if(score >= 60) desc = 'ผ่านเกณฑ์ (Pass)';     // Updated to match bronze criteria (60)
+    else desc = 'ควรพัฒนาเพิ่ม (Practice)';
+  }
+  
+  return `
+  <div class="stage-card ${has?'completed':'empty'}">
+    <div class="top-row">
+      <div class="stage-tag">
+        <span class="dot" style="background:${dotColor}; box-shadow:0 0 8px ${dotColor};"></span>
+        <div>
+          <div class="stage-name">${label}</div>
+          <div class="stage-type">${type==='spark'?'Placement Test':type==='flare'?'Mock Test':'Final Simulation'}</div>
+        </div>
+      </div>
+      <div class="status-pill">${has?'<i class="fa-solid fa-circle-check"></i> ทำแล้ว':'ยังไม่ทำ'}</div>
+    </div>
+    <div class="score-row">
+      <div>
+        <div class="score ${has?'':'empty-txt'}">${has?score+'%':'ไม่มีข้อมูล'}</div>
+        <div class="score-lbl">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>${has ? desc : 'รอยืนยันผลทดสอบ'}</span>
+        </div>
+      </div>
+      <div class="medal-wrap">${medalSvg(mType, 56)}</div>
+    </div>
+    <div class="footer-row">
+      <span class="lvl">${has ? `<i class="fa-solid fa-ribbon"></i> ระดับ: ${desc.split(' ')[0]}` : '\u00A0'}</span>
+    </div>
+  </div>`;
+}
+
+function renderCards(subjData){
+  const spark = subjData ? subjData.spark : null;
+  const flare = subjData ? subjData.flare : null;
+  const sup = subjData ? subjData.super : null;
+  const scores = [spark, flare, sup].filter(v=>v!=null);
+  
+  const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+  
+  let bestLabel = '—';
+  if(scores.length){
+    const best = Math.max(...scores);
+    bestLabel = sup===best ? 'SuperNOVA' : flare===best ? 'Flare' : 'Spark';
+  }
+  
+  const medals = [spark, flare, sup].map(medalType);
+  const bestMedal = medals.includes('gold') ? '🥇 ทอง (Gold)' : medals.includes('silver') ? '🥈 เงิน (Silver)' : medals.includes('bronze') ? '🥉 ทองแดง (Bronze)' : '—';
+
+  document.getElementById('cardsRow').innerHTML = `
+    ${scoreCard('Spark','spark', spark)}
+    ${scoreCard('Flare','flare', flare)}
+    ${scoreCard('SuperNOVA','super', sup)}
+    <div class="summary-panel">
+      <h3>🏆 สรุปผลสัมฤทธิ์</h3>
+      <div class="summary-item"><span class="l">คะแนนเฉลี่ยวิชา</span><span class="v">${scores.length?avg+'%':'—'}</span></div>
+      <div class="summary-item"><span class="l">ช่วงคะแนนสูงสุด</span><span class="v gold">${bestLabel}</span></div>
+      <div class="summary-item"><span class="l">เหรียญสูงสุด</span><span class="v">${bestMedal}</span></div>
+      <div class="summary-item"><span class="l">การมีส่วนร่วม</span><span class="v good">${scores.length}/3 การทดสอบ</span></div>
+    </div>
+  `;
+}
+
+/* ---------- overall header stats ---------- */
+function renderOverall(){
+  const s = currentStudent;
+  document.getElementById('pAvatar').textContent = s.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  document.getElementById('pName').textContent = s.name;
+  document.getElementById('pMeta').textContent = `${s.class} · เลขที่ ${s.no} · ${s.login}`;
+  document.getElementById('wName').textContent = s.name.split(' ')[0];
+
+  const allScores = [];
+  let subjectsCountWithData = 0;
+  
+  Object.values(s.scores).forEach(st => { 
+    let stepCount = 0;
+    ['spark','flare','super'].forEach(k => { 
+      if(st[k]!=null) {
+        allScores.push(st[k]); 
+        stepCount++;
+      }
+    }); 
+    if(stepCount > 0) subjectsCountWithData++;
+  });
+  
+  const overallAvg = allScores.length ? Math.round(allScores.reduce((a,b)=>a+b,0)/allScores.length) : 0;
+  document.getElementById('avgScore').textContent = overallAvg + '%';
+  document.getElementById('testedSubjectsCount').textContent = subjectsCountWithData;
+  document.getElementById('wSub').textContent = `มีข้อมูลผลคะแนนรวมบันทึกไว้ในระบบ ${subjectsCountWithData} จาก ${SUBJECTS.length} วิชา`;
+}
+
+function renderAll(){
+  renderOverall();
+  renderOrbit();
+  const subj = SUBJECTS.find(s=>s.id===activeSubjectId);
+  const subjData = currentStudent.scores[activeSubjectId] || null;
+  document.getElementById('currentSubjectLabel').textContent = subj.name;
+  document.getElementById('missionSubjectTag').textContent = 'TRACK: ' + subj.name.toUpperCase();
+  
+  // Call the dynamic responsive map draw instead of static
+  drawResponsiveMission(subjData);
+  renderCards(subjData);
+}
+
+/* ---------- Export & Print Action ---------- */
+document.getElementById('exportBtn').addEventListener('click', () => {
+  // Get all styles
+  let styles = "";
+  document.querySelectorAll('style, link[rel="stylesheet"]').forEach(el => {
+    styles += el.outerHTML;
+  });
+
+  // Re-build print specific minimal layout content
+  const studentInfo = `
+    <div style="margin-bottom:20px; border-bottom:1px solid #ddd; padding-bottom:10px;">
+      <h1 style="color:#111f45; margin-bottom:4px;">รายงานผลคะแนนโครงการโอลิมปิก (NOVA Model)</h1>
+      <p style="color:#555; font-size:16px;"><b>ชื่อ-สกุล:</b> ${currentStudent.name} &nbsp; <b>ชั้น:</b> ${currentStudent.class} &nbsp; <b>เลขที่:</b> ${currentStudent.no}</p>
+    </div>
+  `;
+
+  // Clone components for print
+  const cardsHtml = document.getElementById('cardsRow').outerHTML;
+  const missionHtml = document.getElementById('printArea').outerHTML;
+  const subjName = document.getElementById('currentSubjectLabel').textContent;
+
+  const contentToPrint = `
+    <div style="max-width:900px; margin:0 auto; padding:20px; background:#fff; color:#000;">
+      ${studentInfo}
+      <h2 style="color:#111f45; margin-top:20px; margin-bottom:15px;">วิชาที่ประเมิน: ${subjName}</h2>
+      <div style="background:#f8f9fa; border:1px solid #ddd; padding:15px; border-radius:12px; margin-bottom:20px;">
+        ${missionHtml}
+      </div>
+      ${cardsHtml}
+      <div style="margin-top:40px; font-size:12px; color:#888; text-align:center;">เอกสารนี้จัดทำโดยระบบ NOVA Model อัตโนมัติ</div>
+    </div>
+  `;
+
+  // Open New Window
+  const newWin = window.open('', '_blank');
+  
+  if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
+    // Show Modal Alert if Pop-up blocked
+    document.getElementById('alertModal').classList.add('active');
+    return;
+  }
+
+  // Write content to new window and trigger print
+  newWin.document.write(`
+    <html>
+      <head>
+        <title>รายงานผลคะแนน - ${currentStudent.name}</title>
+        ${styles}
+        <style>
+          /* Override dark theme styles for print tab */
+          body { background: #fff !important; color: #000 !important; }
+          .mission-panel, .stage-card, .summary-panel { background: #fff !important; border-color: #ddd !important; box-shadow: none !important; }
+          .stage-card .score, .stage-card .stage-name, .summary-item .v { color: #000 !important; }
+          text { fill: #000 !important; } 
+          line { stroke: #ccc !important; }
+          .sname, .stype { color: #333 !important; }
+          .mission-panel .glow, #stars { display: none !important; }
+        </style>
+      </head>
+      <body>
+        ${contentToPrint}
+        <script>
+          window.onload = function() {
+            setTimeout(() => {
+              window.print();
+            }, 500); // slight delay to ensure fonts/svgs render
+          };
+        <\/script>
+      </body>
+    </html>
+  `);
+  newWin.document.close();
+});
+
+window.addEventListener('load', async ()=>{
+  try {
+    await loadStudents();
+  } catch(e) {
+    console.error(e);
+  }
+});
+</script>
+</body>
+</html>
