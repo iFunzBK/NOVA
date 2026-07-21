@@ -91,23 +91,8 @@
     75% { transform: translateX(6px); }
   }
 
-  .db-status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: 20px;
-    background: rgba(95,224,168,0.1);
-    border: 1px solid rgba(95,224,168,0.25);
-    color: var(--good);
-    align-self: center;
-  }
-  .db-status-badge.loading {
-    background: rgba(255,200,87,0.1);
-    border-color: rgba(255,200,87,0.25);
-    color: var(--gold);
-  }
+  .db-status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 4px 8px; border-radius: 20px; background: rgba(95,224,168,0.1); border: 1px solid rgba(95,224,168,0.25); color: var(--good); align-self: center; }
+  .db-status-badge.loading { background: rgba(255,200,87,0.1); border-color: rgba(255,200,87,0.25); color: var(--gold); }
 
   /* ============ APP ============ */
   #app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
@@ -128,7 +113,6 @@
   .logout-btn { display: flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 12px; font-weight: 600; cursor: pointer; }
   .logout-btn:hover { border-color: rgba(255,107,107,0.4); color: var(--bad); }
 
-  /* Welcome Banner */
   .welcome-banner { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; padding: 28px 32px; border-radius: var(--radius); background: radial-gradient(1100px 300px at 10% -20%, rgba(76,141,255,0.22), transparent 70%), var(--navy-panel); border: 1px solid var(--line); margin-bottom: 26px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
   .welcome-banner h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
   .welcome-banner h1 b { color: var(--cyan); }
@@ -141,13 +125,11 @@
   .avg-badge.blue-theme .num { color: var(--cyan); }
   .avg-badge .lbl { font-size: 10px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; margin-top: 2px; }
 
-  /* Sections header styles */
   .section-label { display: flex; align-items: center; gap: 11px; margin: 30px 2px 18px; flex-wrap: wrap; }
   .section-label .idx { font-family: 'IBM Plex Mono'; font-size: 11px; color: var(--cyan); border: 1px solid rgba(127,216,255,0.35); border-radius: 6px; padding: 2px 8px; font-weight: bold; background: rgba(127,216,255,0.05); }
   .section-label h2 { font-size: 18px; font-weight: 600; color: var(--white); }
   .section-label .sub { font-size: 12.5px; color: var(--mist-dim); margin-left: auto; }
 
-  /* Orbit subject selector */
   .orbit-panel { 
     position: relative; 
     border-radius: var(--radius); 
@@ -177,11 +159,12 @@
     align-items: flex-start; 
     padding: 36px 24px 24px; 
     gap: 10px; 
-    min-width: 860px;
+    min-width: 1040px; /* อัปเดตความกว้างเผื่อวิชาภูมิศาสตร์ 8 วิชา */
   }
   
   .orbit-line { 
-    position: absolute; left: 6%; right: 6%; 
+    position: absolute; 
+    left: 81px; right: 81px; /* 24px padding + 57px (half of 114px node) */
     top: 66px; 
     height: 2px; background: repeating-linear-gradient(90deg, rgba(127,216,255,0.3) 0 8px, transparent 8px 16px); z-index: 0; 
   }
@@ -198,24 +181,22 @@
   .subject-node:hover:not(.active) .lbl { color: var(--white); }
   .subject-node .data-dot { position: absolute; top: -1px; right: 24px; width: 10px; height: 10px; border-radius: 50%; background: var(--good); box-shadow: 0 0 8px var(--good); border: 2px solid var(--navy-panel); }
 
-  /* Mission Map Canvas / SVG section */
   .mission-panel { border-radius: var(--radius); background: linear-gradient(180deg, #0e1c45, #080f26); border: 1px solid var(--line); padding: 26px; margin-bottom: 26px; position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.25); }
   .mission-panel .glow { position: absolute; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(76,141,255,0.16), transparent 70%); top: -180px; right: -120px; pointer-events: none; }
   .mission-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; position: relative; flex-wrap: wrap; gap: 10px; }
   .mission-head h2 { font-size: 17px; font-weight: 600; letter-spacing: 0.5px; }
   .mission-head .current-subject { font-family: 'IBM Plex Mono'; font-size: 11px; color: var(--cyan); background: rgba(127,216,255,0.1); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(127,216,255,0.2); }
   .mission-svg-wrap { position: relative; margin-top: 18px; background: rgba(5, 10, 28, 0.4); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.03); }
-  .stage-caption { display: flex; justify-content: space-between; margin-top: 14px; position: relative; height: 45px; }
-  .stage-caption > div { position: absolute; text-align: center; width: 120px; transform: translateX(-50%); }
+  .stage-caption { display: block; margin-top: 14px; position: relative; height: 45px; }
+  .stage-caption > div { position: absolute; text-align: center; transform: translateX(-50%); }
   .stage-caption .sname { font-family: 'Space Grotesk'; font-size: 14.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--white); }
   .stage-caption .stype { font-size: 10px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
 
-  /* Scorecards & Details grid */
   .cards-row { display: grid; grid-template-columns: repeat(3, 1fr) 280px; gap: 20px; margin-bottom: 30px; }
-  .stage-card { border-radius: 18px; background: var(--navy-panel); border: 1px solid var(--line); padding: 22px; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  .stage-card { border-radius: 18px; background: var(--navy-panel); border: 1px solid var(--line); padding: 22px; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
   .stage-card:hover { transform: translateY(-4px); border-color: rgba(127,216,255,0.25); box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
   .stage-card.empty { opacity: 0.5; }
-  .stage-card .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .stage-card .top-row { display: flex; align-items: center; justify-content: space-between; }
   .stage-card .stage-tag { display: flex; align-items: center; gap: 10px; }
   .stage-card .stage-tag .dot { width: 10px; height: 10px; border-radius: 50%; }
   .stage-card .stage-name { font-family: 'Space Grotesk'; font-size: 16px; font-weight: 700; color: #fff; }
@@ -223,34 +204,24 @@
   .stage-card .status-pill { font-size: 9.5px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--line); color: var(--mist-dim); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; background: rgba(0,0,0,0.15); }
   .stage-card.completed .status-pill { color: var(--good); border-color: rgba(95,224,168,0.2); background: rgba(95,224,168,0.05); }
   
-  .stage-card .score-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .stage-card .score-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 8px; }
   .stage-card .score { font-family: 'Space Grotesk'; font-size: 38px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
   .stage-card .score.empty-txt { font-size: 14px; color: var(--mist-dim); font-family: 'Inter'; font-weight: 500; letter-spacing: 0; }
   .stage-card .score-lbl { font-size: 11.5px; color: var(--mist-dim); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
   .medal-wrap { width: 56px; height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-
-  /* New Global Stats Row inside Card */
-  .global-stats-row { 
-    display: flex; 
-    justify-content: space-between; 
-    background: rgba(0,0,0,0.25); 
-    border-radius: 12px; 
-    padding: 10px 14px; 
-    margin-bottom: 16px; 
-    border: 1px solid rgba(255,255,255,0.03);
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
-  }
-  .g-stat { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-  .g-lbl { font-size: 9px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-  .g-val { font-family: 'IBM Plex Mono'; font-size: 13px; font-weight: 700; color: var(--mist); }
-  .g-stat.avg .g-val { color: var(--cyan); }
-  .g-stat.max .g-val { color: var(--gold); }
-  .g-stat.min .g-val { color: var(--bad); }
   
+  /* Global Stats Component in Card */
+  .global-stats-row { display: flex; gap: 8px; margin-top: 10px; padding: 10px 8px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--line); justify-content: space-between; }
+  .global-stats-row .stat-box { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .global-stats-row .stat-box .v { font-family: 'Space Grotesk'; font-size: 13px; font-weight: 700; line-height: 1.2; }
+  .global-stats-row .stat-box .l { font-size: 9.5px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .stat-min { color: var(--bad); }
+  .stat-avg { color: var(--cyan); }
+  .stat-max { color: var(--gold); }
+
   .stage-card .footer-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--line); }
   .stage-card .footer-row .lvl { font-size: 11px; color: var(--mist); display: flex; align-items: center; gap: 5px; }
 
-  /* Summary panel details */
   .summary-panel { border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px; background: linear-gradient(160deg,#142456,#080f2b); border: 1px solid var(--line); box-shadow: inset 0 0 20px rgba(76,141,255,0.05); }
   .summary-panel h3 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--white); text-transform: uppercase; letter-spacing: 0.8px; }
   .summary-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
@@ -260,24 +231,11 @@
   .summary-item .v.good { color: var(--good); }
   .summary-item .v.gold { color: var(--gold); }
 
-  /* Export block */
-  .export-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(90deg, rgba(76,141,255,0.06), rgba(127,216,255,0.06));
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    margin-top: 26px;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
+  .export-section { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, rgba(76,141,255,0.06), rgba(127,216,255,0.06)); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 24px; margin-top: 26px; flex-wrap: wrap; gap: 16px; }
   .export-info h3 { font-size: 15px; font-weight: 600; color: var(--white); }
   .export-info p { font-size: 12px; color: var(--mist-dim); margin-top: 3px; }
   .export-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-family: 'Space Grotesk'; font-weight: 600; }
 
-  /* Modal for errors/alerts */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
   .modal-overlay.active { opacity: 1; pointer-events: auto; }
   .modal-box { background: var(--navy-panel); border: 1px solid var(--line); border-radius: 20px; padding: 30px; max-width: 400px; width: 90%; text-align: center; transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
@@ -288,10 +246,12 @@
   .modal-close { padding: 10px 24px; border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
   .modal-close:hover { background: rgba(255,255,255,0.2); }
 
-  /* Print Styles used by the new window */
-  .print-only-style { display: none; }
+  @media print {
+    /* Basic print overrides for A4 optimization */
+    body { background: #fff !important; color: #000 !important; }
+    .stage-caption .sname { font-size: 12px; } /* ป้องกันข้อความล้นตอนปรินต์ */
+  }
 
-  /* Responsive Adjustments */
   @media (max-width: 1080px) {
     .cards-row { grid-template-columns: repeat(3, 1fr); }
     .summary-panel { grid-column: span 3; }
@@ -303,8 +263,8 @@
     .welcome-banner { grid-template-columns: 1fr; padding: 22px 24px; }
     .stats-combo { width: 100%; justify-content: flex-start; }
     
-    .orbit-track { min-width: 700px; padding: 32px 16px 24px; }
-    .orbit-line { top: 57px; } 
+    .orbit-track { min-width: 840px; padding: 32px 16px 24px; }
+    .orbit-line { top: 57px; left: 61px; right: 61px; } /* 16px(padding) + 45px(half of 90px orb) */
     
     .subject-node { flex: 0 0 90px; }
     .subject-node .orb { width: 50px; height: 50px; }
@@ -523,7 +483,7 @@ const icons = {
   mathematics: '<path d="M6 8c2 4 2 4 0 8M18 8c-2 4-2 4 0 8" stroke-width="2"/>',
   juniorAstro: '<path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/>',
   seniorAstro: '<circle cx="10" cy="12" r="5.5"/><path d="M4.5 12h11M10 6.5v11"/><circle cx="18" cy="8" r="1.4" fill="currentColor" stroke="none"/>',
-  geography: '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="12" rx="3.5" ry="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 12h16" stroke="currentColor" stroke-width="1.8"/>'
+  geography: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'
 };
 
 const SUBJECTS = [
@@ -540,25 +500,16 @@ const SUBJECTS = [
 /* ---------- Local Sandbox Data ---------- */
 const LOCAL_FALLBACK_STUDENTS = [
   {
-    login: "50914",
-    password: "password",
-    name: "สัณหณัฐ จอมทอง",
-    class: "ม.5/1",
-    no: "1",
+    login: "50914", password: "password", name: "สัณหณัฐ จอมทอง", class: "ม.5/1", no: "1",
     scores: {
       physics: { spark: 90, flare: 88, super: 95 },
       biology: { spark: 75, flare: 65, super: 85 },
       chemistry: { spark: 60, flare: null, super: 72 },
-      mathematics: { spark: 88, flare: 91, super: 89 },
-      geography: { spark: 82, flare: 85, super: 90 }
+      mathematics: { spark: 88, flare: 91, super: 89 }
     }
   },
   {
-    login: "50915",
-    password: "password",
-    name: "มนัสชนก ไตรสิทธิ์",
-    class: "ม.5/3",
-    no: "14",
+    login: "50915", password: "password", name: "มนัสชนก ไตรสิทธิ์", class: "ม.5/3", no: "14",
     scores: {
       biology: { spark: 95, flare: 92, super: 98 },
       computer: { spark: 82, flare: 86, super: 89 },
@@ -566,26 +517,24 @@ const LOCAL_FALLBACK_STUDENTS = [
     }
   },
   {
-    login: "50916",
-    password: "password",
-    name: "วิทวัส แสนศักดิ์",
-    class: "ม.4/1",
-    no: "8",
+    login: "50916", password: "password", name: "วิทวัส แสนศักดิ์", class: "ม.4/1", no: "8",
     scores: {
       juniorAstro: { spark: 88, flare: 84, super: 91 },
       mathematics: { spark: 70, flare: 75, super: null }
     }
   },
   {
-    login: "50917",
-    password: "password",
-    name: "เกศินี ปัญญาพูน",
-    class: "ม.6/2",
-    no: "22",
+    login: "50917", password: "password", name: "เกศินี ปัญญาพูน", class: "ม.6/2", no: "22",
     scores: {
       seniorAstro: { spark: 92, flare: 96, super: 95 },
       physics: { spark: 84, flare: 80, super: 88 },
       computer: { spark: 90, flare: 95, super: 92 }
+    }
+  },
+  {
+    login: "50918", password: "password", name: "ทดสอบ ภูมิศาสตร์", class: "ม.5/2", no: "5",
+    scores: {
+      geography: { spark: 65, flare: 70, super: 85 }
     }
   }
 ];
@@ -606,23 +555,17 @@ async function loadStudents(){
       statusBadge.style.background = "rgba(95,224,168,0.15)";
       statusBadge.style.color = "var(--good)";
       return; 
-    } catch(e) {
-      console.warn("Cache parsing error", e);
-    }
+    } catch(e) { console.warn("Cache parsing error", e); }
   }
 
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); 
-    
     const res = await fetch(API_URL, { signal: controller.signal });
     clearTimeout(timeoutId);
-    
     if(!res.ok) throw new Error("Load failed");
     STUDENTS = await res.json();
-    
     sessionStorage.setItem('nova_students_cache', JSON.stringify(STUDENTS));
-    
     statusBadge.className = "db-status-badge";
     statusText.innerText = "เชื่อมต่อคลาวด์ API สำเร็จ";
     statusBadge.style.background = "rgba(95,224,168,0.15)";
@@ -659,7 +602,6 @@ function tryLogin(){
   renderAll();
 }
 
-/* ---------- event binds ---------- */
 document.getElementById('loginBtn').addEventListener('click', tryLogin);
 document.getElementById('passInput').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
 document.getElementById('loginInput').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
@@ -670,39 +612,33 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   document.getElementById('app').classList.add('hidden');
   document.getElementById('loginScreen').classList.remove('hidden');
 });
+window.addEventListener('resize', () => {
+  if (currentStudent && activeSubjectId) {
+    const subjData = currentStudent.scores[activeSubjectId] || null;
+    drawResponsiveMission(subjData);
+  }
+});
 
-/* ---------- Global Stats Calculator ---------- */
-// ฟังก์ชันสำหรับคำนวณคะแนนสูงสุด ต่ำสุด และเฉลี่ยของผู้สอบทุกคนในรายวิชา/ด่านนั้นๆ
-function getGlobalStats(subjectId, stageKey) {
-  let allScores = [];
-  
-  // วนลูปเก็บคะแนนของทุกคนที่สอบวิชานี้และด่านนี้
+/* ---------- Data Helpers ---------- */
+function getGlobalStats(subjectId, stage) {
+  const scores = [];
   STUDENTS.forEach(student => {
-    if (student.scores && student.scores[subjectId] && student.scores[subjectId][stageKey] != null) {
-      allScores.push(student.scores[subjectId][stageKey]);
+    if (student.scores && student.scores[subjectId] && student.scores[subjectId][stage] != null) {
+      scores.push(student.scores[subjectId][stage]);
     }
   });
-
-  // ถ้าไม่มีใครสอบเลย ให้คืนค่าเป็นขีด (-)
-  if (allScores.length === 0) {
-    return { max: '-', min: '-', avg: '-' };
-  }
-
-  // คำนวณ
-  const max = Math.max(...allScores);
-  const min = Math.min(...allScores);
-  const sum = allScores.reduce((a, b) => a + b, 0);
-  const avg = Math.round(sum / allScores.length);
-
-  return { max, min, avg };
+  if (scores.length === 0) return { min: '-', avg: '-', max: '-' };
+  const min = Math.min(...scores);
+  const max = Math.max(...scores);
+  const avg = Math.round(scores.reduce((a,b)=>a+b,0) / scores.length);
+  return { min, avg, max };
 }
 
-/* ---------- medal helpers ---------- */
 function medalType(score){
   if(score == null) return 'empty';
-  if(score >= 80) return 'gold';
-  if(score >= 70) return 'silver';
-  if(score >= 60) return 'bronze';
+  if(score >= 80) return 'gold';    
+  if(score >= 70) return 'silver';  
+  if(score >= 60) return 'bronze';  
   return 'none';
 }
 
@@ -758,56 +694,61 @@ function renderOrbit(){
   });
 }
 
-/* ---------- dynamic mission map & captions ---------- */
+/* ---------- dynamic responsive mission map ---------- */
 function drawResponsiveMission(subjData) {
   const wrap = document.getElementById('missionSvgWrap');
   const captionWrap = document.getElementById('stageCaptionWrap');
   
-  // ใช้พิกัดแบบร้อยละ (Percentage) เพื่อให้กราฟยืดหยุ่น 100% ทั้งบนหน้าจอและหน้าพิมพ์
-  const pts = [
-    { key:'spark', pct: 15, score: subjData ? subjData.spark : null },
-    { key:'flare', pct: 50, score: subjData ? subjData.flare : null },
-    { key:'super', pct: 85, score: subjData ? subjData.super : null },
-  ];
   const yFor = (score) => score==null ? 135 : 175 - (score/100)*120;
-  pts.forEach(p => p.y = yFor(p.score));
   
-  // สร้างเส้นกราฟเชื่อมต่อโดยใช้พิกัด %
+  // ใช้ค่าเปอเซนต์เพื่อให้วาดเส้นและจุดได้สมส่วน 100% ไม่ล้นหน้าจอ 
+  const p1 = { score: subjData ? subjData.spark : null, x: '15%', y: yFor(subjData ? subjData.spark : null) };
+  const p2 = { score: subjData ? subjData.flare : null, x: '50%', y: yFor(subjData ? subjData.flare : null) };
+  const p3 = { score: subjData ? subjData.super : null, x: '85%', y: yFor(subjData ? subjData.super : null) };
+  
+  const pts = [p1, p2, p3];
+  const hasAny = pts.some(p => p.score != null);
+
+  // วาดเส้นกราฟด้วยแท็ก <line> เพราะสามารถระบุแกนแบบเปอเซนต์ได้โดยตรง
   let linesHtml = '';
-  if (pts[0].score != null && pts[1].score != null) {
-     linesHtml += `<line x1="15%" y1="${pts[0].y}" x2="50%" y2="${pts[1].y}" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>`;
-  }
-  if (pts[1].score != null && pts[2].score != null) {
-     linesHtml += `<line x1="50%" y1="${pts[1].y}" x2="85%" y2="${pts[2].y}" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>`;
-  }
-  if (pts[0].score != null && pts[1].score == null && pts[2].score != null) {
-     // กรณีข้ามสอบอันกลาง (มีหัว-ท้าย)
-     linesHtml += `<line x1="15%" y1="${pts[0].y}" x2="85%" y2="${pts[2].y}" stroke="var(--blue)" stroke-width="3.5" stroke-dasharray="8 6" stroke-linecap="round"/>`;
+  if (hasAny) {
+    linesHtml += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>`;
+    linesHtml += `<line x1="${p2.x}" y1="${p2.y}" x2="${p3.x}" y2="${p3.y}" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>`;
   }
 
-  const dotsAndLabels = pts.map(p=>{
+  const dotsAndLabels = pts.map(p => {
     const has = p.score != null;
     return `<g>
       ${has ? `
-      <line x1="${p.pct}%" y1="205" x2="${p.pct}%" y2="${p.y}" stroke="rgba(127,216,255,0.15)" stroke-width="1" stroke-dasharray="3 3"/>
-      <circle cx="${p.pct}%" cy="${p.y}" r="8" fill="#7fd8ff" stroke="#080f26" stroke-width="3"/>
-      <circle cx="${p.pct}%" cy="${p.y}" r="14" fill="none" stroke="#7fd8ff" stroke-width="1" opacity="0.35"/>` :
-      `<circle cx="${p.pct}%" cy="135" r="6" fill="none" stroke="#3a4a78" stroke-width="1.5" stroke-dasharray="2 3"/>`}
-      <text x="${p.pct}%" y="${(has?p.y:135) - 22}" text-anchor="middle" fill="#f5f7fb" font-family="Space Grotesk" font-weight="700" font-size="19">${has ? p.score+'%' : '—'}</text>
+      <line x1="${p.x}" y1="205" x2="${p.x}" y2="${p.y}" stroke="rgba(127,216,255,0.15)" stroke-width="1" stroke-dasharray="3 3"/>
+      <circle cx="${p.x}" cy="${p.y}" r="8" fill="#7fd8ff" stroke="#080f26" stroke-width="3"/>
+      <circle cx="${p.x}" cy="${p.y}" r="14" fill="none" stroke="#7fd8ff" stroke-width="1" opacity="0.35"/>` :
+      `<circle cx="${p.x}" cy="135" r="6" fill="none" stroke="#3a4a78" stroke-width="1.5" stroke-dasharray="2 3"/>`}
+      <text x="${p.x}" y="${(has ? p.y : 135) - 22}" text-anchor="middle" fill="#f5f7fb" font-family="Space Grotesk" font-weight="700" font-size="19">${has ? p.score+'%' : '—'}</text>
     </g>`;
   }).join('');
 
   wrap.innerHTML = `
   <svg width="100%" height="230" style="overflow:visible; display:block;">
-    <line x1="5%" y1="205" x2="95%" y2="205" stroke="#22305c" stroke-width="1.5"/>
+    <line x1="3%" y1="205" x2="97%" y2="205" stroke="#22305c" stroke-width="1.5"/>
     ${linesHtml}
     ${dotsAndLabels}
   </svg>`;
 
+  // ปรับการจัดเรียงข้อความข้างล่างกราฟให้ใช้ % ควบคู่กับ CSS เพื่อไม่ให้ล้นจอตอนพริ้นท์
   captionWrap.innerHTML = `
-    <div style="left: 15%;"><div class="sname"><i class="fa-solid fa-star" style="color:var(--cyan); font-size:12px;"></i> Spark</div><div class="stype">Placement Test</div></div>
-    <div style="left: 50%;"><div class="sname"><i class="fa-solid fa-bolt" style="color:var(--violet); font-size:12px;"></i> Flare</div><div class="stype">Mock Test</div></div>
-    <div style="left: 85%;"><div class="sname"><i class="fa-solid fa-circle-nodes" style="color:var(--gold); font-size:12px;"></i> SuperNOVA</div><div class="stype">Final Simulation</div></div>
+    <div style="position: absolute; left: 15%; transform: translateX(-50%); text-align: center; width: 32%;">
+      <div class="sname"><i class="fa-solid fa-star" style="color:var(--cyan); font-size:12px;"></i> Spark</div>
+      <div class="stype">Placement Test</div>
+    </div>
+    <div style="position: absolute; left: 50%; transform: translateX(-50%); text-align: center; width: 32%;">
+      <div class="sname"><i class="fa-solid fa-bolt" style="color:var(--violet); font-size:12px;"></i> Flare</div>
+      <div class="stype">Mock Test</div>
+    </div>
+    <div style="position: absolute; left: 85%; transform: translateX(-50%); text-align: center; width: 32%;">
+      <div class="sname"><i class="fa-solid fa-circle-nodes" style="color:var(--gold); font-size:12px;"></i> SuperNOVA</div>
+      <div class="stype">Final Simulation</div>
+    </div>
   `;
 }
 
@@ -817,17 +758,17 @@ function scoreCard(label, type, score){
   const mType = medalType(score);
   const dotColor = type==='spark' ? 'var(--cyan)' : type==='flare' ? 'var(--violet)' : 'var(--gold)';
   
-  // Calculate Global Stats
-  const gStats = getGlobalStats(activeSubjectId, type);
-  
   let desc = 'ยังไม่ทำ';
   if(has) {
-    if(score >= 80) desc = 'ดีเยี่ยม (Excellent)';
-    else if(score >= 70) desc = 'ดีมาก (Proficient)';
-    else if(score >= 60) desc = 'ผ่านเกณฑ์ (Pass)';
+    if(score >= 80) desc = 'ดีเยี่ยม (Excellent)';      
+    else if(score >= 70) desc = 'ดีมาก (Proficient)';   
+    else if(score >= 60) desc = 'ผ่านเกณฑ์ (Pass)';     
     else desc = 'ควรพัฒนาเพิ่ม (Practice)';
   }
   
+  // Calculate Global Stats
+  const gStats = getGlobalStats(activeSubjectId, type);
+
   return `
   <div class="stage-card ${has?'completed':'empty'}">
     <div class="top-row">
@@ -851,20 +792,11 @@ function scoreCard(label, type, score){
       <div class="medal-wrap">${medalSvg(mType, 56)}</div>
     </div>
     
-    <!-- New Global Stats Section -->
+    <!-- MIN AVG MAX STATS -->
     <div class="global-stats-row">
-      <div class="g-stat min">
-        <span class="g-lbl">ต่ำสุด (Min)</span>
-        <span class="g-val">${gStats.min !== '-' ? gStats.min+'%' : '-'}</span>
-      </div>
-      <div class="g-stat avg">
-        <span class="g-lbl">เฉลี่ย (Avg)</span>
-        <span class="g-val">${gStats.avg !== '-' ? gStats.avg+'%' : '-'}</span>
-      </div>
-      <div class="g-stat max">
-        <span class="g-lbl">สูงสุด (Max)</span>
-        <span class="g-val">${gStats.max !== '-' ? gStats.max+'%' : '-'}</span>
-      </div>
+      <div class="stat-box"><span class="v stat-min">${gStats.min}${gStats.min !== '-' ? '%' : ''}</span><span class="l">ต่ำสุด</span></div>
+      <div class="stat-box"><span class="v stat-avg">${gStats.avg}${gStats.avg !== '-' ? '%' : ''}</span><span class="l">เฉลี่ย</span></div>
+      <div class="stat-box"><span class="v stat-max">${gStats.max}${gStats.max !== '-' ? '%' : ''}</span><span class="l">สูงสุด</span></div>
     </div>
 
     <div class="footer-row">
@@ -896,7 +828,7 @@ function renderCards(subjData){
     ${scoreCard('SuperNOVA','super', sup)}
     <div class="summary-panel">
       <h3>🏆 สรุปผลสัมฤทธิ์</h3>
-      <div class="summary-item"><span class="l">คะแนนเฉลี่ยวิชาของคุณ</span><span class="v">${scores.length?avg+'%':'—'}</span></div>
+      <div class="summary-item"><span class="l">คะแนนเฉลี่ยวิชา</span><span class="v">${scores.length?avg+'%':'—'}</span></div>
       <div class="summary-item"><span class="l">ช่วงคะแนนสูงสุด</span><span class="v gold">${bestLabel}</span></div>
       <div class="summary-item"><span class="l">เหรียญสูงสุด</span><span class="v">${bestMedal}</span></div>
       <div class="summary-item"><span class="l">การมีส่วนร่วม</span><span class="v good">${scores.length}/3 การทดสอบ</span></div>
@@ -987,15 +919,21 @@ document.getElementById('exportBtn').addEventListener('click', () => {
         <title>รายงานผลคะแนน - ${currentStudent.name}</title>
         ${styles}
         <style>
+          /* Override dark theme styles for print tab */
           body { background: #fff !important; color: #000 !important; }
           .mission-panel, .stage-card, .summary-panel { background: #fff !important; border-color: #ddd !important; box-shadow: none !important; }
           .stage-card .score, .stage-card .stage-name, .summary-item .v { color: #000 !important; }
-          .global-stats-row { background: #f0f2f5 !important; border: 1px solid #ddd !important; }
-          .g-val { color: #111f45 !important; }
           text { fill: #000 !important; } 
           line { stroke: #ccc !important; }
+          /* Preserve blue color for map lines */
+          line[stroke="var(--blue)"] { stroke: #4c8dff !important; }
           .sname, .stype { color: #333 !important; }
           .mission-panel .glow, #stars { display: none !important; }
+          /* Print fixes for global stats row */
+          .global-stats-row { background: #f0f4f8 !important; border: 1px solid #ccc !important; }
+          .stat-min { color: #d93838 !important; }
+          .stat-avg { color: #0066cc !important; }
+          .stat-max { color: #d48806 !important; }
         </style>
       </head>
       <body>
@@ -1014,11 +952,8 @@ document.getElementById('exportBtn').addEventListener('click', () => {
 });
 
 window.addEventListener('load', async ()=>{
-  try {
-    await loadStudents();
-  } catch(e) {
-    console.error(e);
-  }
+  try { await loadStudents(); } 
+  catch(e) { console.error(e); }
 });
 </script>
 </body>
