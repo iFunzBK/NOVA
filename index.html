@@ -522,7 +522,8 @@ const icons = {
   chemistry: '<path d="M9 3h6M10 3v5.2L5.5 17a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3L14 8.2V3"/><path d="M7.5 14h9"/>',
   mathematics: '<path d="M6 8c2 4 2 4 0 8M18 8c-2 4-2 4 0 8" stroke-width="2"/>',
   juniorAstro: '<path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/>',
-  seniorAstro: '<circle cx="10" cy="12" r="5.5"/><path d="M4.5 12h11M10 6.5v11"/><circle cx="18" cy="8" r="1.4" fill="currentColor" stroke="none"/>'
+  seniorAstro: '<circle cx="10" cy="12" r="5.5"/><path d="M4.5 12h11M10 6.5v11"/><circle cx="18" cy="8" r="1.4" fill="currentColor" stroke="none"/>',
+  geography: '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="12" rx="3.5" ry="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 12h16" stroke="currentColor" stroke-width="1.8"/>'
 };
 
 const SUBJECTS = [
@@ -533,6 +534,7 @@ const SUBJECTS = [
   { id:'mathematics', name:'คณิตศาสตร์', icon: icons.mathematics },
   { id:'juniorAstro', name:'ดาราศาสตร์ ม.ต้น', icon: icons.juniorAstro },
   { id:'seniorAstro', name:'ดาราศาสตร์ ม.ปลาย', icon: icons.seniorAstro },
+  { id:'geography', name:'ภูมิศาสตร์', icon: icons.geography },
 ];
 
 /* ---------- Local Sandbox Data ---------- */
@@ -547,7 +549,8 @@ const LOCAL_FALLBACK_STUDENTS = [
       physics: { spark: 90, flare: 88, super: 95 },
       biology: { spark: 75, flare: 65, super: 85 },
       chemistry: { spark: 60, flare: null, super: 72 },
-      mathematics: { spark: 88, flare: 91, super: 89 }
+      mathematics: { spark: 88, flare: 91, super: 89 },
+      geography: { spark: 82, flare: 85, super: 90 }
     }
   },
   {
@@ -667,12 +670,6 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   document.getElementById('app').classList.add('hidden');
   document.getElementById('loginScreen').classList.remove('hidden');
 });
-window.addEventListener('resize', () => {
-  if (currentStudent && activeSubjectId) {
-    const subjData = currentStudent.scores[activeSubjectId] || null;
-    drawResponsiveMission(subjData);
-  }
-});
 
 /* ---------- Global Stats Calculator ---------- */
 // ฟังก์ชันสำหรับคำนวณคะแนนสูงสุด ต่ำสุด และเฉลี่ยของผู้สอบทุกคนในรายวิชา/ด่านนั้นๆ
@@ -766,43 +763,51 @@ function drawResponsiveMission(subjData) {
   const wrap = document.getElementById('missionSvgWrap');
   const captionWrap = document.getElementById('stageCaptionWrap');
   
-  const totalWidth = wrap.clientWidth || 800;
-  
+  // ใช้พิกัดแบบร้อยละ (Percentage) เพื่อให้กราฟยืดหยุ่น 100% ทั้งบนหน้าจอและหน้าพิมพ์
   const pts = [
-    { key:'spark', x: totalWidth * 0.15, score: subjData ? subjData.spark : null },
-    { key:'flare', x: totalWidth * 0.50, score: subjData ? subjData.flare : null },
-    { key:'super', x: totalWidth * 0.85, score: subjData ? subjData.super : null },
+    { key:'spark', pct: 15, score: subjData ? subjData.spark : null },
+    { key:'flare', pct: 50, score: subjData ? subjData.flare : null },
+    { key:'super', pct: 85, score: subjData ? subjData.super : null },
   ];
   const yFor = (score) => score==null ? 135 : 175 - (score/100)*120;
   pts.forEach(p => p.y = yFor(p.score));
   
-  const path = `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y}`;
+  // สร้างเส้นกราฟเชื่อมต่อโดยใช้พิกัด %
+  let linesHtml = '';
+  if (pts[0].score != null && pts[1].score != null) {
+     linesHtml += `<line x1="15%" y1="${pts[0].y}" x2="50%" y2="${pts[1].y}" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>`;
+  }
+  if (pts[1].score != null && pts[2].score != null) {
+     linesHtml += `<line x1="50%" y1="${pts[1].y}" x2="85%" y2="${pts[2].y}" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>`;
+  }
+  if (pts[0].score != null && pts[1].score == null && pts[2].score != null) {
+     // กรณีข้ามสอบอันกลาง (มีหัว-ท้าย)
+     linesHtml += `<line x1="15%" y1="${pts[0].y}" x2="85%" y2="${pts[2].y}" stroke="var(--blue)" stroke-width="3.5" stroke-dasharray="8 6" stroke-linecap="round"/>`;
+  }
 
   const dotsAndLabels = pts.map(p=>{
     const has = p.score != null;
     return `<g>
       ${has ? `
-      <path d="M${p.x} 205 L${p.x} ${p.y}" stroke="rgba(127,216,255,0.15)" stroke-width="1" stroke-dasharray="3 3"/>
-      <circle cx="${p.x}" cy="${p.y}" r="8" fill="#7fd8ff" stroke="#080f26" stroke-width="3"/>
-      <circle cx="${p.x}" cy="${p.y}" r="14" fill="none" stroke="#7fd8ff" stroke-width="1" opacity="0.35"/>` :
-      `<circle cx="${p.x}" cy="135" r="6" fill="none" stroke="#3a4a78" stroke-width="1.5" stroke-dasharray="2 3"/>`}
-      <text x="${p.x}" y="${(has?p.y:135) - 22}" text-anchor="middle" fill="#f5f7fb" font-family="Space Grotesk" font-weight="700" font-size="19">${has ? p.score+'%' : '—'}</text>
+      <line x1="${p.pct}%" y1="205" x2="${p.pct}%" y2="${p.y}" stroke="rgba(127,216,255,0.15)" stroke-width="1" stroke-dasharray="3 3"/>
+      <circle cx="${p.pct}%" cy="${p.y}" r="8" fill="#7fd8ff" stroke="#080f26" stroke-width="3"/>
+      <circle cx="${p.pct}%" cy="${p.y}" r="14" fill="none" stroke="#7fd8ff" stroke-width="1" opacity="0.35"/>` :
+      `<circle cx="${p.pct}%" cy="135" r="6" fill="none" stroke="#3a4a78" stroke-width="1.5" stroke-dasharray="2 3"/>`}
+      <text x="${p.pct}%" y="${(has?p.y:135) - 22}" text-anchor="middle" fill="#f5f7fb" font-family="Space Grotesk" font-weight="700" font-size="19">${has ? p.score+'%' : '—'}</text>
     </g>`;
   }).join('');
 
-  const hasAny = pts.some(p=>p.score!=null);
-  
   wrap.innerHTML = `
   <svg width="100%" height="230" style="overflow:visible; display:block;">
-    <line x1="30" y1="205" x2="${totalWidth-30}" y2="205" stroke="#22305c" stroke-width="1.5"/>
-    ${hasAny ? `<path d="${path}" fill="none" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+    <line x1="5%" y1="205" x2="95%" y2="205" stroke="#22305c" stroke-width="1.5"/>
+    ${linesHtml}
     ${dotsAndLabels}
   </svg>`;
 
   captionWrap.innerHTML = `
-    <div style="left: ${pts[0].x}px;"><div class="sname"><i class="fa-solid fa-star" style="color:var(--cyan); font-size:12px;"></i> Spark</div><div class="stype">Placement Test</div></div>
-    <div style="left: ${pts[1].x}px;"><div class="sname"><i class="fa-solid fa-bolt" style="color:var(--violet); font-size:12px;"></i> Flare</div><div class="stype">Mock Test</div></div>
-    <div style="left: ${pts[2].x}px;"><div class="sname"><i class="fa-solid fa-circle-nodes" style="color:var(--gold); font-size:12px;"></i> SuperNOVA</div><div class="stype">Final Simulation</div></div>
+    <div style="left: 15%;"><div class="sname"><i class="fa-solid fa-star" style="color:var(--cyan); font-size:12px;"></i> Spark</div><div class="stype">Placement Test</div></div>
+    <div style="left: 50%;"><div class="sname"><i class="fa-solid fa-bolt" style="color:var(--violet); font-size:12px;"></i> Flare</div><div class="stype">Mock Test</div></div>
+    <div style="left: 85%;"><div class="sname"><i class="fa-solid fa-circle-nodes" style="color:var(--gold); font-size:12px;"></i> SuperNOVA</div><div class="stype">Final Simulation</div></div>
   `;
 }
 
