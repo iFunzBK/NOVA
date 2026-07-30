@@ -183,9 +183,14 @@
   
   .orbit-line { 
     position: absolute; 
-    left: 81px; right: 81px; /* แก้ไขจุดเริ่มต้น-จุดสิ้นสุดของเส้นให้ตกกึ่งกลางไอคอนแรกและไอคอนสุดท้ายพอดี */
+    left: 81px; 
+    right: 81px; /* ล็อคจุดเริ่มต้นและจุดจบให้อยู่กึ่งกลางไอคอนแรกและไอคอนสุดท้ายพอดี */
     top: 66px; 
-    height: 2px; background: repeating-linear-gradient(90deg, rgba(127,216,255,0.3) 0 8px, transparent 8px 16px); z-index: 0; 
+    height: 2px; 
+    background: repeating-linear-gradient(90deg, rgba(127,216,255,0.3) 0 8px, transparent 8px 16px); 
+    z-index: 0; 
+    width: auto; /* บังคับให้ขยายตามกล่องแม่เสมอ */
+    pointer-events: none;
   }
   
   .subject-node { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 0 0 114px; cursor: pointer; background: none; border: none; color: inherit; font-family: inherit; transition: all 0.25s; }
@@ -345,7 +350,12 @@
     .stats-combo { width: 100%; justify-content: flex-start; }
     
     .orbit-track { min-width: 700px; padding: 32px 16px 24px; }
-    .orbit-line { top: 57px; left: 61px; right: 61px; } 
+    
+    .orbit-line { 
+      top: 57px; 
+      left: 61px; 
+      right: 61px; 
+    } 
     
     .subject-node { flex: 0 0 90px; }
     .subject-node .orb { width: 50px; height: 50px; }
