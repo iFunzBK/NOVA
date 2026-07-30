@@ -178,20 +178,16 @@
     align-items: flex-start; 
     padding: 36px 24px 24px; 
     gap: 10px; 
-    min-width: 1040px; /* แก้ไขความกว้างขั้นต่ำเผื่อ 8 วิชา */
+    min-width: 1040px; 
+    
+    /* สร้างเส้นประด้วย Background เพื่อแก้ปัญหาบั๊กถูกตัดเส้นของ Safari/LINE แบบถาวร */
+    background-image: repeating-linear-gradient(90deg, rgba(127,216,255,0.3) 0 8px, transparent 8px 16px);
+    background-position: 81px 66px;
+    background-size: calc(100% - 162px) 2px;
+    background-repeat: no-repeat;
   }
   
-  .orbit-line { 
-    position: absolute; 
-    left: 81px; 
-    right: 81px; /* ล็อคจุดเริ่มต้นและจุดจบให้อยู่กึ่งกลางไอคอนแรกและไอคอนสุดท้ายพอดี */
-    top: 66px; 
-    height: 2px; 
-    background: repeating-linear-gradient(90deg, rgba(127,216,255,0.3) 0 8px, transparent 8px 16px); 
-    z-index: 0; 
-    width: auto; /* บังคับให้ขยายตามกล่องแม่เสมอ */
-    pointer-events: none;
-  }
+  /* ลบ .orbit-line เดิมทิ้งทั้งหมดเพราะใช้พื้นหลังแทนแล้ว */
   
   .subject-node { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 0 0 114px; cursor: pointer; background: none; border: none; color: inherit; font-family: inherit; transition: all 0.25s; }
   .subject-node .orb { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(160deg, #162452, #080f2b); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: inset 0 2px 6px rgba(255,255,255,0.05); }
@@ -349,13 +345,16 @@
     .welcome-banner { grid-template-columns: 1fr; padding: 22px 24px; }
     .stats-combo { width: 100%; justify-content: flex-start; }
     
-    .orbit-track { min-width: 700px; padding: 32px 16px 24px; }
+    .orbit-track { 
+      min-width: 700px; 
+      padding: 32px 16px 24px; 
+      
+      /* ปรับตำแหน่งและขนาดเส้นประพื้นหลังสำหรับมือถือ */
+      background-position: 61px 57px;
+      background-size: calc(100% - 122px) 2px;
+    }
     
-    .orbit-line { 
-      top: 57px; 
-      left: 61px; 
-      right: 61px; 
-    } 
+    /* ลบ .orbit-line ในโหมดมือถือเดิมทิ้งด้วย */
     
     .subject-node { flex: 0 0 90px; }
     .subject-node .orb { width: 50px; height: 50px; }
@@ -781,7 +780,7 @@ function medalSvg(type, size){
 
 function renderOrbit(){
   const track = document.getElementById('orbitTrack');
-  track.innerHTML = '<div class="orbit-line"></div>' + SUBJECTS.map(s => {
+  track.innerHTML = SUBJECTS.map(s => {
     const hasData = !!(currentStudent.scores[s.id] && (currentStudent.scores[s.id].spark !== null || currentStudent.scores[s.id].flare !== null || currentStudent.scores[s.id].super !== null));
     return `
     <button class="subject-node ${s.id===activeSubjectId?'active':''}" data-id="${s.id}">
