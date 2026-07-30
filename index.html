@@ -155,7 +155,6 @@
     border: 1px solid var(--line); 
     margin-bottom: 26px; 
     box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-    
     overflow-x: auto; 
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
@@ -165,7 +164,6 @@
     background: radial-gradient(600px 250px at 50% -30%, rgba(76,141,255,0.18), transparent 70%); 
     pointer-events: none; border-radius: var(--radius); 
   }
-  
   .orbit-panel::-webkit-scrollbar { height: 6px; }
   .orbit-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; margin: 0 16px; }
   .orbit-panel::-webkit-scrollbar-thumb { background: rgba(127,216,255,0.2); border-radius: 10px; }
@@ -178,16 +176,20 @@
     align-items: flex-start; 
     padding: 36px 24px 24px; 
     gap: 10px; 
-    min-width: 1040px; 
-    
-    /* สร้างเส้นประด้วย Background เพื่อแก้ปัญหาบั๊กถูกตัดเส้นของ Safari/LINE แบบถาวร */
-    background-image: repeating-linear-gradient(90deg, rgba(127,216,255,0.3) 0 8px, transparent 8px 16px);
-    background-position: 81px 66px;
-    background-size: calc(100% - 162px) 2px;
-    background-repeat: no-repeat;
+    min-width: 1040px; /* สำหรับ 8 วิชา */
   }
   
-  /* ลบ .orbit-line เดิมทิ้งทั้งหมดเพราะใช้พื้นหลังแทนแล้ว */
+  /* แก้ปัญหาเส้นประใน LINE ด้วยสมการคณิตศาสตร์ที่เบราว์เซอร์ตัดทิ้งไม่ได้ */
+  .orbit-line { 
+    position: absolute; 
+    top: 66px; 
+    left: 81px; /* 24px (padding) + 57px (ครึ่งหนึ่งของ 114px node) */
+    width: calc(100% - 162px); /* หักล้างซ้ายและขวา (81 * 2) */
+    height: 2px; 
+    border-top: 2px dashed rgba(127,216,255,0.4);
+    z-index: 0; 
+    pointer-events: none;
+  }
   
   .subject-node { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 0 0 114px; cursor: pointer; background: none; border: none; color: inherit; font-family: inherit; transition: all 0.25s; }
   .subject-node .orb { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(160deg, #162452, #080f2b); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: inset 0 2px 6px rgba(255,255,255,0.05); }
@@ -201,19 +203,20 @@
   .subject-node:hover:not(.active) .lbl { color: var(--white); }
   .subject-node .data-dot { position: absolute; top: -1px; right: 24px; width: 10px; height: 10px; border-radius: 50%; background: var(--good); box-shadow: 0 0 8px var(--good); border: 2px solid var(--navy-panel); }
 
-  /* Mission Map Canvas / SVG section */
+  /* Mission Map SVG section */
   .mission-panel { border-radius: var(--radius); background: linear-gradient(180deg, #0e1c45, #080f26); border: 1px solid var(--line); padding: 26px; margin-bottom: 26px; position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.25); }
   .mission-panel .glow { position: absolute; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(76,141,255,0.16), transparent 70%); top: -180px; right: -120px; pointer-events: none; }
   .mission-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; position: relative; flex-wrap: wrap; gap: 10px; }
   .mission-head h2 { font-size: 17px; font-weight: 600; letter-spacing: 0.5px; }
   .mission-head .current-subject { font-family: 'IBM Plex Mono'; font-size: 11px; color: var(--cyan); background: rgba(127,216,255,0.1); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(127,216,255,0.2); }
   .mission-svg-wrap { position: relative; margin-top: 18px; background: rgba(5, 10, 28, 0.4); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.03); }
-  .stage-caption { display: block; margin-top: 14px; position: relative; height: 45px; }
-  .stage-caption > div { position: absolute; text-align: center; transform: translateX(-50%); width: 32%; } /* ปรับ width เป็น 32% กันข้อความล้นตอน Print */
+  
+  .stage-caption { display: flex; justify-content: space-between; margin-top: 14px; position: relative; height: 45px; }
+  .stage-caption > div { position: absolute; text-align: center; width: 32%; transform: translateX(-50%); }
   .stage-caption .sname { font-family: 'Space Grotesk'; font-size: 14.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--white); }
   .stage-caption .stype { font-size: 10px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
 
-  /* Scorecards & Details grid */
+  /* Scorecards & Global Stats */
   .cards-row { display: grid; grid-template-columns: repeat(3, 1fr) 280px; gap: 20px; margin-bottom: 30px; }
   .stage-card { border-radius: 18px; background: var(--navy-panel); border: 1px solid var(--line); padding: 22px; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
   .stage-card:hover { transform: translateY(-4px); border-color: rgba(127,216,255,0.25); box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
@@ -232,16 +235,16 @@
   .stage-card .score-lbl { font-size: 11.5px; color: var(--mist-dim); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
   .medal-wrap { width: 56px; height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
   
-  /* Global Stats Component in Card */
-  .global-stats-row { display: flex; gap: 8px; margin-top: 10px; padding: 10px 8px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--line); justify-content: space-between; }
-  .global-stats-row .stat-box { display: flex; flex-direction: column; align-items: center; flex: 1; }
-  .global-stats-row .stat-box .v { font-family: 'Space Grotesk'; font-size: 13px; font-weight: 700; line-height: 1.2; }
-  .global-stats-row .stat-box .l { font-size: 9.5px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-  .stat-min { color: var(--bad); }
-  .stat-avg { color: var(--cyan); }
-  .stat-max { color: var(--gold); }
-
-  .stage-card .footer-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--line); }
+  /* MIN AVG MAX Stats Row */
+  .global-stats-row { display: flex; gap: 8px; margin-top: auto; padding-top: 14px; border-top: 1px dashed var(--line); }
+  .g-stat { flex: 1; display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 8px 4px; border: 1px solid rgba(255,255,255,0.02); }
+  .g-stat .slbl { font-size: 9px; color: var(--mist-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .g-stat .sval { font-family: 'IBM Plex Mono'; font-size: 13px; font-weight: 600; }
+  .g-stat.min .sval { color: var(--bad); }
+  .g-stat.avg .sval { color: var(--cyan); }
+  .g-stat.max .sval { color: var(--gold); }
+  
+  .stage-card .footer-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
   .stage-card .footer-row .lvl { font-size: 11px; color: var(--mist); display: flex; align-items: center; gap: 5px; }
 
   /* Summary panel details */
@@ -254,56 +257,24 @@
   .summary-item .v.good { color: var(--good); }
   .summary-item .v.gold { color: var(--gold); }
 
-  /* ============ HALL OF FAME (ทำเนียบคนเก่ง) ============ */
-  .hof-section { margin-bottom: 30px; }
-  .hof-panel {
-    background: var(--navy-panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  }
-  .hof-stage-block { margin-bottom: 24px; }
-  .hof-stage-block:last-child { margin-bottom: 0; }
-  .hof-stage-header { 
-    display: flex; align-items: center; gap: 10px; margin-bottom: 16px; 
-    padding-bottom: 10px; border-bottom: 1px solid var(--line);
-  }
-  .hof-stage-header h3 { font-size: 16px; font-weight: 700; color: var(--white); }
-  .hof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .hof-col { 
-    background: rgba(0,0,0,0.15); 
-    border-radius: 12px; padding: 16px; 
-    border: 1px solid rgba(255,255,255,0.03);
-    max-height: 280px; overflow-y: auto;
-  }
-  .hof-col::-webkit-scrollbar { width: 4px; }
-  .hof-col::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
-  .hof-col::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-  .hof-col h4 { 
-    font-size: 13px; font-weight: 700; margin-bottom: 12px; 
-    display: flex; align-items: center; gap: 8px; text-transform: uppercase;
-  }
-  .hof-col.gold h4 { color: var(--gold); }
-  .hof-col.silver h4 { color: var(--silver); }
-  .hof-col.bronze h4 { color: var(--bronze); }
-  
-  .hof-item { 
-    display: flex; flex-direction: column; gap: 2px; 
-    padding: 10px 12px; background: rgba(255,255,255,0.03); 
-    border-radius: 8px; margin-bottom: 8px; border: 1px solid transparent;
-    transition: background 0.2s;
-  }
-  .hof-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
-  .hof-item:last-child { margin-bottom: 0; }
-  .hof-item .s-top { display: flex; justify-content: space-between; align-items: flex-start; }
-  .hof-item .s-name { font-size: 13px; font-weight: 600; color: var(--white); }
-  .hof-item .s-score { font-family: 'Space Grotesk'; font-size: 13px; font-weight: 700; }
-  .hof-col.gold .s-score { color: var(--gold); }
-  .hof-col.silver .s-score { color: var(--silver); }
-  .hof-col.bronze .s-score { color: var(--bronze); }
-  .hof-item .s-meta { font-size: 11px; color: var(--mist-dim); font-family: 'IBM Plex Mono'; }
-  .hof-empty { font-size: 12px; color: var(--mist-dim); text-align: center; padding: 20px 0; font-style: italic; }
+  /* Hall of Fame Award Board */
+  .hof-panel { background: linear-gradient(180deg, #111f45, #0a122e); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; margin-bottom: 26px; position: relative; overflow: hidden; }
+  .hof-panel::after { content: ""; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,200,87,0.1), transparent 70%); pointer-events: none; }
+  .hof-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+  .hof-header h3 { font-size: 18px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; }
+  .hof-tabs { display: flex; gap: 8px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 12px; border: 1px solid var(--line); }
+  .hof-tab { padding: 6px 16px; font-size: 12px; font-weight: 600; color: var(--mist-dim); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+  .hof-tab.active { background: rgba(127,216,255,0.15); color: var(--cyan); }
+  .hof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .hof-col { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.03); }
+  .hof-col h4 { font-family: 'Space Grotesk'; font-size: 14px; text-align: center; padding-bottom: 12px; border-bottom: 1px dashed var(--line); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .hof-list { display: flex; flex-direction: column; gap: 8px; }
+  .hof-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 12px; }
+  .hof-item .stu-info { display: flex; flex-direction: column; gap: 2px; }
+  .hof-item .stu-name { font-weight: 600; color: var(--white); }
+  .hof-item .stu-meta { font-size: 10px; color: var(--mist-dim); font-family: 'IBM Plex Mono'; }
+  .hof-item .stu-score { font-family: 'Space Grotesk'; font-weight: 700; font-size: 14px; }
+  .hof-empty { text-align: center; color: var(--mist-dim); font-size: 12px; padding: 20px 0; font-style: italic; }
 
   /* Export block */
   .export-section {
@@ -314,7 +285,7 @@
     border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 20px 24px;
-    margin-top: 10px;
+    margin-bottom: 26px;
     flex-wrap: wrap;
     gap: 16px;
   }
@@ -337,6 +308,7 @@
   @media (max-width: 1080px) {
     .cards-row { grid-template-columns: repeat(3, 1fr); }
     .summary-panel { grid-column: span 3; }
+    .hof-grid { grid-template-columns: 1fr; gap: 12px; }
   }
   @media (max-width: 860px) {
     #app { padding: 18px 14px 40px; }
@@ -346,15 +318,15 @@
     .stats-combo { width: 100%; justify-content: flex-start; }
     
     .orbit-track { 
-      min-width: 700px; 
+      min-width: 840px; 
       padding: 32px 16px 24px; 
-      
-      /* ปรับตำแหน่งและขนาดเส้นประพื้นหลังสำหรับมือถือ */
-      background-position: 61px 57px;
-      background-size: calc(100% - 122px) 2px;
     }
     
-    /* ลบ .orbit-line ในโหมดมือถือเดิมทิ้งด้วย */
+    .orbit-line { 
+      top: 57px;
+      left: 61px;
+      width: calc(100% - 122px);
+    }
     
     .subject-node { flex: 0 0 90px; }
     .subject-node .orb { width: 50px; height: 50px; }
@@ -362,19 +334,13 @@
     
     .stage-caption .sname { font-size: 12px; }
     .stage-caption .stype { font-size: 8px; }
-
-    .hof-grid { grid-template-columns: 1fr; }
-    .hof-col { max-height: 200px; }
   }
   @media (max-width: 640px) {
     .cards-row { grid-template-columns: 1fr; }
     .summary-panel { grid-column: span 1; }
     .export-section { flex-direction: column; text-align: center; }
-  }
-  
-  /* Print Styles used by the new window - ซ่อน Hall of Fame ตอนพริ้นท์ส่วนตัว */
-  @media print {
-    .hof-section { display: none !important; }
+    .hof-header { flex-direction: column; align-items: stretch; }
+    .hof-tabs { justify-content: space-between; }
   }
 </style>
 </head>
@@ -521,28 +487,32 @@
     </div>
     <div class="mission-svg-wrap" id="missionSvgWrap"></div>
     <div class="stage-caption" id="stageCaptionWrap">
-      <!-- Captions injected dynamically to match graph width -->
+      <!-- Captions injected dynamically -->
     </div>
   </div>
 
   <div class="cards-row" id="cardsRow"></div>
 
-  <!-- ============ HALL OF FAME ============ -->
-  <div class="section-label hof-section-title">
-    <span class="idx">03</span>
-    <h2>ทำเนียบคนเก่ง (Hall of Fame)</h2>
-    <span class="sub">ประกาศรางวัลนักเรียนที่ผ่านเกณฑ์ยอดเยี่ยมประจำวิชา</span>
-  </div>
-  
-  <div class="hof-section" id="hallOfFameWrap">
-    <!-- Hall of Fame content will be injected here -->
+  <!-- Hall of Fame Award Board -->
+  <div class="hof-panel" id="hallOfFamePanel">
+    <div class="hof-header">
+      <h3><i class="fa-solid fa-trophy" style="color:var(--gold);"></i> ทำเนียบคนเก่ง (Award Board)</h3>
+      <div class="hof-tabs" id="hofTabs">
+        <div class="hof-tab active" data-stage="spark">Spark</div>
+        <div class="hof-tab" data-stage="flare">Flare</div>
+        <div class="hof-tab" data-stage="super">SuperNOVA</div>
+      </div>
+    </div>
+    <div class="hof-grid" id="hofGrid">
+      <!-- Generated by JS -->
+    </div>
   </div>
 
   <!-- Export Banner -->
   <div class="export-section">
     <div class="export-info">
       <h3>ระบบรายงานผลคะแนนเพื่อพัฒนาศักยภาพของนักเรียน</h3>
-      <p>คุณสามารถบันทึกหรือพิมพ์รายงานผลคะแนนปัจจุบันเพื่อใช้ประกอบการประเมินส่วนตัวได้</p>
+      <p>คุณสามารถบันทึกหรือพิมพ์รายงานผลคะแนนปัจจุบันเพื่อใช้ประกอบการประเมินส่วนตัวได้ (รายงานจะไม่แสดงทำเนียบคนเก่ง)</p>
     </div>
     <button class="export-btn btn-secondary" id="exportBtn">
       <i class="fa-solid fa-print"></i> จัดพิมพ์รายงาน
@@ -561,6 +531,7 @@
 </div>
 
 <script>
+/* ---------- Starfield Animation Background ---------- */
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
 function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -582,6 +553,7 @@ function drawStars(){
 }
 drawStars();
 
+/* ---------- Subject Definitions & SVGs ---------- */
 const icons = {
   physics: '<circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>',
   biology: '<path d="M6 4c0 8 12 8 12 16M18 4c0 8-12 8-12 16"/><path d="M7 8h3M14 8h3M6.3 12h3.4M14.3 12h3.4M7.5 16h3M13.5 16h3"/>',
@@ -590,7 +562,7 @@ const icons = {
   mathematics: '<path d="M6 8c2 4 2 4 0 8M18 8c-2 4-2 4 0 8" stroke-width="2"/>',
   juniorAstro: '<path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/>',
   seniorAstro: '<circle cx="10" cy="12" r="5.5"/><path d="M4.5 12h11M10 6.5v11"/><circle cx="18" cy="8" r="1.4" fill="currentColor" stroke="none"/>',
-  geography: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'
+  geography: '<circle cx="12" cy="12" r="9"/><path d="M12 3 c-4 0-7 4-7 9 s3 9 7 9 s7-4 7-9 s-3-9-7-9 z" fill="none"/><path d="M3 12 h18"/><path d="M5 7 h14"/><path d="M5 17 h14"/>'
 };
 
 const SUBJECTS = [
@@ -604,48 +576,13 @@ const SUBJECTS = [
   { id:'geography', name:'ภูมิศาสตร์', icon: icons.geography },
 ];
 
+/* ---------- Local Sandbox Data ---------- */
 const LOCAL_FALLBACK_STUDENTS = [
-  {
-    login: "50914", password: "password", name: "สัณหณัฐ จอมทอง", class: "ม.5/1", no: "1",
-    scores: {
-      physics: { spark: 90, flare: 88, super: 95 },
-      biology: { spark: 75, flare: 65, super: 85 },
-      chemistry: { spark: 60, flare: null, super: 72 },
-      mathematics: { spark: 88, flare: 91, super: 89 }
-    }
-  },
-  {
-    login: "50915", password: "password", name: "มนัสชนก ไตรสิทธิ์", class: "ม.5/3", no: "14",
-    scores: {
-      biology: { spark: 95, flare: 92, super: 98 },
-      computer: { spark: 82, flare: 86, super: 89 },
-      chemistry: { spark: 74, flare: 70, super: 78 }
-    }
-  },
-  {
-    login: "50916", password: "password", name: "วิทวัส แสนศักดิ์", class: "ม.4/1", no: "8",
-    scores: {
-      juniorAstro: { spark: 88, flare: 84, super: 91 },
-      mathematics: { spark: 70, flare: 75, super: null },
-      physics: { spark: 82, flare: 75, super: 80 }
-    }
-  },
-  {
-    login: "50917", password: "password", name: "เกศินี ปัญญาพูน", class: "ม.6/2", no: "22",
-    scores: {
-      seniorAstro: { spark: 92, flare: 96, super: 95 },
-      physics: { spark: 84, flare: 80, super: 88 },
-      computer: { spark: 90, flare: 95, super: 92 },
-      geography: { spark: 95, flare: 90, super: 92 }
-    }
-  },
-  {
-    login: "50918", password: "password", name: "สมชาย รักเรียน", class: "ม.5/2", no: "5",
-    scores: {
-      geography: { spark: 65, flare: 70, super: 85 },
-      physics: { spark: 62, flare: 68, super: 75 }
-    }
-  }
+  { login: "50914", password: "password", name: "สัณหณัฐ จอมทอง", class: "ม.5/1", no: "1", scores: { physics: { spark: 90, flare: 88, super: 95 }, biology: { spark: 75, flare: 65, super: 85 }, chemistry: { spark: 60, flare: null, super: 72 }, mathematics: { spark: 88, flare: 91, super: 89 } } },
+  { login: "50915", password: "password", name: "มนัสชนก ไตรสิทธิ์", class: "ม.5/3", no: "14", scores: { biology: { spark: 95, flare: 92, super: 98 }, computer: { spark: 82, flare: 86, super: 89 }, chemistry: { spark: 74, flare: 70, super: 78 } } },
+  { login: "50916", password: "password", name: "วิทวัส แสนศักดิ์", class: "ม.4/1", no: "8", scores: { juniorAstro: { spark: 88, flare: 84, super: 91 }, mathematics: { spark: 70, flare: 75, super: null }, geography: { spark: 65, flare: null, super: null } } },
+  { login: "50917", password: "password", name: "เกศินี ปัญญาพูน", class: "ม.6/2", no: "22", scores: { seniorAstro: { spark: 92, flare: 96, super: 95 }, physics: { spark: 84, flare: 80, super: 88 }, computer: { spark: 90, flare: 95, super: 92 }, geography: { spark: 82, flare: 85, super: 88 } } },
+  { login: "50918", password: "password", name: "พีรวัส ชัยชนะ", class: "ม.5/2", no: "10", scores: { geography: { spark: 95, flare: 91, super: 94 }, physics: { spark: 65, flare: 70, super: 72 } } }
 ];
 
 let STUDENTS = [];
@@ -654,7 +591,6 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwIsD3x0UeFNgUyJaNqPdrR
 async function loadStudents(){
   const statusBadge = document.getElementById('dbStatusBadge');
   const statusText = document.getElementById('dbStatusText');
-  
   const cachedData = sessionStorage.getItem('nova_students_cache');
   if (cachedData) {
     try {
@@ -663,7 +599,7 @@ async function loadStudents(){
       statusText.innerText = "เชื่อมต่อฐานข้อมูลสำเร็จ (Cached)";
       statusBadge.style.background = "rgba(95,224,168,0.15)";
       statusBadge.style.color = "var(--good)";
-      return; 
+      return;
     } catch(e) { console.warn("Cache parsing error", e); }
   }
 
@@ -680,7 +616,7 @@ async function loadStudents(){
     statusBadge.style.background = "rgba(95,224,168,0.15)";
     statusBadge.style.color = "var(--good)";
   } catch(e) {
-    console.warn("Could not load from Google Script, applying local fallback:", e);
+    console.warn("Could not load from API, applying fallback:", e);
     STUDENTS = LOCAL_FALLBACK_STUDENTS;
     statusBadge.className = "db-status-badge";
     statusText.innerText = "Sandbox Mode (ออฟไลน์)";
@@ -727,20 +663,6 @@ window.addEventListener('resize', () => {
   }
 });
 
-function getGlobalStats(subjectId, stage) {
-  const scores = [];
-  STUDENTS.forEach(student => {
-    if (student.scores && student.scores[subjectId] && student.scores[subjectId][stage] != null) {
-      scores.push(student.scores[subjectId][stage]);
-    }
-  });
-  if (scores.length === 0) return { min: '-', avg: '-', max: '-' };
-  const min = Math.min(...scores);
-  const max = Math.max(...scores);
-  const avg = Math.round(scores.reduce((a,b)=>a+b,0) / scores.length);
-  return { min, avg, max };
-}
-
 function medalType(score){
   if(score == null) return 'empty';
   if(score >= 80) return 'gold';    
@@ -780,7 +702,7 @@ function medalSvg(type, size){
 
 function renderOrbit(){
   const track = document.getElementById('orbitTrack');
-  track.innerHTML = SUBJECTS.map(s => {
+  const nodesHtml = SUBJECTS.map(s => {
     const hasData = !!(currentStudent.scores[s.id] && (currentStudent.scores[s.id].spark !== null || currentStudent.scores[s.id].flare !== null || currentStudent.scores[s.id].super !== null));
     return `
     <button class="subject-node ${s.id===activeSubjectId?'active':''}" data-id="${s.id}">
@@ -791,6 +713,10 @@ function renderOrbit(){
       <div class="lbl">${s.name}</div>
     </button>`;
   }).join('');
+  
+  // แทรกเส้นประเข้าไปพร้อมกับปุ่ม
+  track.innerHTML = '<div class="orbit-line"></div>' + nodesHtml;
+  
   track.querySelectorAll('.subject-node').forEach(btn=>{
     btn.addEventListener('click', ()=>{ 
       activeSubjectId = btn.dataset.id; 
@@ -800,26 +726,22 @@ function renderOrbit(){
   });
 }
 
+/* ---------- dynamic mission map & captions (Responsive %) ---------- */
 function drawResponsiveMission(subjData) {
   const wrap = document.getElementById('missionSvgWrap');
   const captionWrap = document.getElementById('stageCaptionWrap');
   
+  // ใช้ Percentage (15%, 50%, 85%) แทน Fixed Pixels เพื่อให้กราฟยืดหยุ่นในหน้า Print และจอมือถือ
+  const pts = [
+    { key:'spark', x: '15%', score: subjData ? subjData.spark : null },
+    { key:'flare', x: '50%', score: subjData ? subjData.flare : null },
+    { key:'super', x: '85%', score: subjData ? subjData.super : null },
+  ];
+  
   const yFor = (score) => score==null ? 135 : 175 - (score/100)*120;
-  
-  const p1 = { score: subjData ? subjData.spark : null, x: '15%', y: yFor(subjData ? subjData.spark : null) };
-  const p2 = { score: subjData ? subjData.flare : null, x: '50%', y: yFor(subjData ? subjData.flare : null) };
-  const p3 = { score: subjData ? subjData.super : null, x: '85%', y: yFor(subjData ? subjData.super : null) };
-  
-  const pts = [p1, p2, p3];
-  const hasAny = pts.some(p => p.score != null);
+  pts.forEach(p => p.y = yFor(p.score));
 
-  let linesHtml = '';
-  if (hasAny) {
-    linesHtml += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>`;
-    linesHtml += `<line x1="${p2.x}" y1="${p2.y}" x2="${p3.x}" y2="${p3.y}" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>`;
-  }
-
-  const dotsAndLabels = pts.map(p => {
+  const dotsAndLabels = pts.map(p=>{
     const has = p.score != null;
     return `<g>
       ${has ? `
@@ -827,34 +749,51 @@ function drawResponsiveMission(subjData) {
       <circle cx="${p.x}" cy="${p.y}" r="8" fill="#7fd8ff" stroke="#080f26" stroke-width="3"/>
       <circle cx="${p.x}" cy="${p.y}" r="14" fill="none" stroke="#7fd8ff" stroke-width="1" opacity="0.35"/>` :
       `<circle cx="${p.x}" cy="135" r="6" fill="none" stroke="#3a4a78" stroke-width="1.5" stroke-dasharray="2 3"/>`}
-      <text x="${p.x}" y="${(has ? p.y : 135) - 22}" text-anchor="middle" fill="#f5f7fb" font-family="Space Grotesk" font-weight="700" font-size="19">${has ? p.score+'%' : '—'}</text>
+      <text x="${p.x}" y="${(has?p.y:135) - 22}" text-anchor="middle" fill="#f5f7fb" font-family="Space Grotesk" font-weight="700" font-size="19">${has ? p.score+'%' : '—'}</text>
     </g>`;
   }).join('');
 
+  // Path creation based on percentage (using polyline logic built manually)
+  const hasAny = pts.some(p=>p.score!=null);
+  
+  // Build dynamic path lines
+  let pathLines = '';
+  if (hasAny) {
+    const validPts = pts.filter(p => p.score != null);
+    for(let i=0; i<validPts.length-1; i++){
+      pathLines += `<line x1="${validPts[i].x}" y1="${validPts[i].y}" x2="${validPts[i+1].x}" y2="${validPts[i+1].y}" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>`;
+    }
+  }
+  
   wrap.innerHTML = `
   <svg width="100%" height="230" style="overflow:visible; display:block;">
-    <line x1="3%" y1="205" x2="97%" y2="205" stroke="#22305c" stroke-width="1.5"/>
-    ${linesHtml}
+    <line x1="2%" y1="205" x2="98%" y2="205" stroke="#22305c" stroke-width="1.5"/>
+    ${pathLines}
     ${dotsAndLabels}
   </svg>`;
 
   captionWrap.innerHTML = `
-    <div style="left: 15%;">
-      <div class="sname"><i class="fa-solid fa-star" style="color:var(--cyan); font-size:12px;"></i> Spark</div>
-      <div class="stype">Placement Test</div>
-    </div>
-    <div style="left: 50%;">
-      <div class="sname"><i class="fa-solid fa-bolt" style="color:var(--violet); font-size:12px;"></i> Flare</div>
-      <div class="stype">Mock Test</div>
-    </div>
-    <div style="left: 85%;">
-      <div class="sname"><i class="fa-solid fa-circle-nodes" style="color:var(--gold); font-size:12px;"></i> SuperNOVA</div>
-      <div class="stype">Final Simulation</div>
-    </div>
+    <div style="left: 15%;"><div class="sname"><i class="fa-solid fa-star" style="color:var(--cyan); font-size:12px;"></i> Spark</div><div class="stype">Placement Test</div></div>
+    <div style="left: 50%;"><div class="sname"><i class="fa-solid fa-bolt" style="color:var(--violet); font-size:12px;"></i> Flare</div><div class="stype">Mock Test</div></div>
+    <div style="left: 85%;"><div class="sname"><i class="fa-solid fa-circle-nodes" style="color:var(--gold); font-size:12px;"></i> SuperNOVA</div><div class="stype">Final Simulation</div></div>
   `;
 }
 
-function scoreCard(label, type, score){
+/* ---------- Calculate Global Stats (MIN, AVG, MAX) ---------- */
+function getGlobalStats(subjectId, stageKey) {
+  const scores = STUDENTS
+    .filter(s => s.scores && s.scores[subjectId] && s.scores[subjectId][stageKey] != null)
+    .map(s => s.scores[subjectId][stageKey]);
+    
+  if (scores.length === 0) return { min: '-', avg: '-', max: '-' };
+  const min = Math.min(...scores);
+  const max = Math.max(...scores);
+  const avg = Math.round(scores.reduce((a,b) => a+b, 0) / scores.length);
+  return { min, avg, max };
+}
+
+/* ---------- stage card ---------- */
+function scoreCard(label, type, score, globalStats){
   const has = score != null;
   const mType = medalType(score);
   const dotColor = type==='spark' ? 'var(--cyan)' : type==='flare' ? 'var(--violet)' : 'var(--gold)';
@@ -867,8 +806,6 @@ function scoreCard(label, type, score){
     else desc = 'ควรพัฒนาเพิ่ม (Practice)';
   }
   
-  const gStats = getGlobalStats(activeSubjectId, type);
-
   return `
   <div class="stage-card ${has?'completed':'empty'}">
     <div class="top-row">
@@ -881,6 +818,7 @@ function scoreCard(label, type, score){
       </div>
       <div class="status-pill">${has?'<i class="fa-solid fa-circle-check"></i> ทำแล้ว':'ยังไม่ทำ'}</div>
     </div>
+    
     <div class="score-row">
       <div>
         <div class="score ${has?'':'empty-txt'}">${has?score+'%':'ไม่มีข้อมูล'}</div>
@@ -892,10 +830,11 @@ function scoreCard(label, type, score){
       <div class="medal-wrap">${medalSvg(mType, 56)}</div>
     </div>
     
-    <div class="global-stats-row">
-      <div class="stat-box"><span class="v stat-min">${gStats.min}${gStats.min !== '-' ? '%' : ''}</span><span class="l">ต่ำสุด</span></div>
-      <div class="stat-box"><span class="v stat-avg">${gStats.avg}${gStats.avg !== '-' ? '%' : ''}</span><span class="l">เฉลี่ย</span></div>
-      <div class="stat-box"><span class="v stat-max">${gStats.max}${gStats.max !== '-' ? '%' : ''}</span><span class="l">สูงสุด</span></div>
+    <!-- สถิติภาพรวม -->
+    <div class="global-stats-row print-show-border">
+      <div class="g-stat min"><span class="slbl">ต่ำสุด</span><span class="sval">${globalStats.min}%</span></div>
+      <div class="g-stat avg"><span class="slbl">เฉลี่ยรวม</span><span class="sval">${globalStats.avg}%</span></div>
+      <div class="g-stat max"><span class="slbl">สูงสุด</span><span class="sval">${globalStats.max}%</span></div>
     </div>
 
     <div class="footer-row">
@@ -911,7 +850,6 @@ function renderCards(subjData){
   const scores = [spark, flare, sup].filter(v=>v!=null);
   
   const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-  
   let bestLabel = '—';
   if(scores.length){
     const best = Math.max(...scores);
@@ -921,10 +859,14 @@ function renderCards(subjData){
   const medals = [spark, flare, sup].map(medalType);
   const bestMedal = medals.includes('gold') ? '🥇 ทอง (Gold)' : medals.includes('silver') ? '🥈 เงิน (Silver)' : medals.includes('bronze') ? '🥉 ทองแดง (Bronze)' : '—';
 
+  const gSpark = getGlobalStats(activeSubjectId, 'spark');
+  const gFlare = getGlobalStats(activeSubjectId, 'flare');
+  const gSuper = getGlobalStats(activeSubjectId, 'super');
+
   document.getElementById('cardsRow').innerHTML = `
-    ${scoreCard('Spark','spark', spark)}
-    ${scoreCard('Flare','flare', flare)}
-    ${scoreCard('SuperNOVA','super', sup)}
+    ${scoreCard('Spark','spark', spark, gSpark)}
+    ${scoreCard('Flare','flare', flare, gFlare)}
+    ${scoreCard('SuperNOVA','super', sup, gSuper)}
     <div class="summary-panel">
       <h3>🏆 สรุปผลสัมฤทธิ์</h3>
       <div class="summary-item"><span class="l">คะแนนเฉลี่ยวิชา</span><span class="v">${scores.length?avg+'%':'—'}</span></div>
@@ -935,109 +877,69 @@ function renderCards(subjData){
   `;
 }
 
-function getAwardees(subjectId) {
-  // สร้างโครงสร้างเก็บข้อมูลเปล่ารอรับ
-  const awards = {
-    spark: { gold: [], silver: [], bronze: [] },
-    flare: { gold: [], silver: [], bronze: [] },
-    super: { gold: [], silver: [], bronze: [] }
-  };
+/* ---------- Hall of Fame ---------- */
+let currentHofStage = 'spark';
 
-  STUDENTS.forEach(s => {
-    if (!s.scores || !s.scores[subjectId]) return; // ข้ามถ้านักเรียนไม่มีข้อมูลวิชานี้
-    
-    ['spark', 'flare', 'super'].forEach(stage => {
-      const score = s.scores[subjectId][stage];
-      if (score == null) return;
-      
-      const studentInfo = { name: s.name, class: s.class, no: s.no, score: score };
-
-      // แยกตามเกณฑ์
-      if (score >= 80) awards[stage].gold.push(studentInfo);
-      else if (score >= 70) awards[stage].silver.push(studentInfo);
-      else if (score >= 60) awards[stage].bronze.push(studentInfo);
-    });
-  });
-
-  // เรียงลำดับจากคะแนนมากไปน้อยในแต่ละหมวด
-  const sortDesc = (a, b) => b.score - a.score;
-  ['spark', 'flare', 'super'].forEach(stage => {
-    awards[stage].gold.sort(sortDesc);
-    awards[stage].silver.sort(sortDesc);
-    awards[stage].bronze.sort(sortDesc);
-  });
-
-  return awards;
+function getMedalColorCode(medal) {
+  if (medal === 'gold') return '#ffc857';
+  if (medal === 'silver') return '#c9d3e0';
+  if (medal === 'bronze') return '#d68b52';
+  return '#ffffff';
 }
 
 function renderHallOfFame() {
-  const awards = getAwardees(activeSubjectId);
-  const wrap = document.getElementById('hallOfFameWrap');
-  
-  const stages = [
-    { id: 'spark', name: 'NOVA Spark', icon: 'fa-star', color: 'var(--cyan)' },
-    { id: 'flare', name: 'NOVA Flare', icon: 'fa-bolt', color: 'var(--violet)' },
-    { id: 'super', name: 'SuperNOVA', icon: 'fa-circle-nodes', color: 'var(--gold)' }
-  ];
+  const grid = document.getElementById('hofGrid');
+  const ranks = { gold: [], silver: [], bronze: [] };
 
-  let html = `<div class="hof-panel">`;
-  let hasAnyData = false;
-
-  stages.forEach(stg => {
-    const data = awards[stg.id];
-    const totalAwardees = data.gold.length + data.silver.length + data.bronze.length;
-    
-    if(totalAwardees > 0) {
-      hasAnyData = true;
-      
-      const renderList = (list) => {
-        if(list.length === 0) return `<div class="hof-empty">- ยังไม่มีผู้ผ่านเกณฑ์ -</div>`;
-        return list.map(student => `
-          <div class="hof-item">
-            <div class="s-top">
-              <span class="s-name">${student.name}</span>
-              <span class="s-score">${student.score}%</span>
-            </div>
-            <div class="s-meta">${student.class} | เลขที่ ${student.no}</div>
-          </div>
-        `).join('');
-      };
-
-      html += `
-        <div class="hof-stage-block">
-          <div class="hof-stage-header">
-            <i class="fa-solid ${stg.icon}" style="color:${stg.color};"></i>
-            <h3>${stg.name}</h3>
-          </div>
-          <div class="hof-grid">
-            <div class="hof-col gold">
-              <h4><i class="fa-solid fa-medal"></i> Gold (80-100%)</h4>
-              ${renderList(data.gold)}
-            </div>
-            <div class="hof-col silver">
-              <h4><i class="fa-solid fa-medal"></i> Silver (70-79%)</h4>
-              ${renderList(data.silver)}
-            </div>
-            <div class="hof-col bronze">
-              <h4><i class="fa-solid fa-medal"></i> Bronze (60-69%)</h4>
-              ${renderList(data.bronze)}
-            </div>
-          </div>
-        </div>
-      `;
+  STUDENTS.forEach(stu => {
+    if (stu.scores && stu.scores[activeSubjectId] && stu.scores[activeSubjectId][currentHofStage] != null) {
+      const score = stu.scores[activeSubjectId][currentHofStage];
+      const mType = medalType(score);
+      if (mType !== 'none' && mType !== 'empty') {
+        ranks[mType].push({ name: stu.name, class: stu.class, no: stu.no, score: score });
+      }
     }
   });
 
-  if(!hasAnyData) {
-    html += `<div style="text-align:center; padding: 40px 0; color:var(--mist-dim);">
-      <i class="fa-regular fa-folder-open" style="font-size:24px; margin-bottom:12px;"></i><br>
-      ยังไม่มีข้อมูลนักเรียนที่ผ่านเกณฑ์ในรายวิชานี้
-    </div>`;
-  }
+  ['gold', 'silver', 'bronze'].forEach(type => ranks[type].sort((a,b) => b.score - a.score));
 
-  html += `</div>`;
-  wrap.innerHTML = html;
+  const colsHtml = [
+    { type: 'gold', title: '🥇 Gold Award', min: '80% ขึ้นไป' },
+    { type: 'silver', title: '🥈 Silver Award', min: '70% - 79%' },
+    { type: 'bronze', title: '🥉 Bronze Award', min: '60% - 69%' }
+  ].map(col => {
+    const items = ranks[col.type];
+    const listHtml = items.length > 0 
+      ? items.map(p => `
+          <div class="hof-item">
+            <div class="stu-info">
+              <div class="stu-name">${p.name}</div>
+              <div class="stu-meta">ม.${p.class} เลขที่ ${p.no}</div>
+            </div>
+            <div class="stu-score" style="color:${getMedalColorCode(col.type)}">${p.score}%</div>
+          </div>
+        `).join('')
+      : `<div class="hof-empty">ยังไม่มีผู้ผ่านเกณฑ์ในระดับนี้</div>`;
+
+    return `
+      <div class="hof-col">
+        <h4 style="color:${getMedalColorCode(col.type)}">${col.title} <span style="font-size:10px; color:#6c7aa3; font-family:'Inter'; font-weight:normal;">(${col.min})</span></h4>
+        <div class="hof-list">${listHtml}</div>
+      </div>
+    `;
+  }).join('');
+
+  grid.innerHTML = colsHtml;
 }
+
+document.querySelectorAll('.hof-tab').forEach(tab => {
+  tab.addEventListener('click', (e) => {
+    document.querySelectorAll('.hof-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    currentHofStage = e.target.dataset.stage;
+    renderHallOfFame();
+  });
+});
 
 function renderOverall(){
   const s = currentStudent;
@@ -1076,9 +978,15 @@ function renderAll(){
   
   drawResponsiveMission(subjData);
   renderCards(subjData);
-  renderHallOfFame(); // เรียกใช้งานทำเนียบคนเก่ง
+  
+  // รีเซ็ตแท็บและโหลด Hall of fame
+  document.querySelectorAll('.hof-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.hof-tab[data-stage="spark"]').classList.add('active');
+  currentHofStage = 'spark';
+  renderHallOfFame();
 }
 
+/* ---------- Export & Print Action ---------- */
 document.getElementById('exportBtn').addEventListener('click', () => {
   let styles = "";
   document.querySelectorAll('style, link[rel="stylesheet"]').forEach(el => {
@@ -1121,19 +1029,22 @@ document.getElementById('exportBtn').addEventListener('click', () => {
         <title>รายงานผลคะแนน - ${currentStudent.name}</title>
         ${styles}
         <style>
-          /* Override dark theme styles for print tab */
-          body { background: #fff !important; color: #000 !important; }
-          .mission-panel, .stage-card, .summary-panel { background: #fff !important; border-color: #ddd !important; box-shadow: none !important; }
+          body { background: #fff !important; color: #000 !important; font-family: 'Inter', sans-serif !important; }
+          .mission-panel, .stage-card, .summary-panel, .g-stat { background: #fff !important; border-color: #ddd !important; box-shadow: none !important; }
           .stage-card .score, .stage-card .stage-name, .summary-item .v { color: #000 !important; }
-          text { fill: #000 !important; } 
+          text { fill: #000 !important; font-size: 14px !important; } 
           line { stroke: #ccc !important; }
-          line[stroke="var(--blue)"] { stroke: #4c8dff !important; }
           .sname, .stype { color: #333 !important; }
-          .mission-panel .glow, #stars { display: none !important; }
-          .global-stats-row { background: #f0f4f8 !important; border: 1px solid #ccc !important; }
-          .stat-min { color: #d93838 !important; }
-          .stat-avg { color: #0066cc !important; }
-          .stat-max { color: #d48806 !important; }
+          .mission-panel .glow, #stars, .hof-panel, .export-section { display: none !important; }
+          .g-stat .slbl, .g-stat .sval { color: #555 !important; }
+          .print-show-border { border-top: 1px solid #ddd !important; }
+          /* Reduce scale slightly for print safety */
+          .stage-caption > div { font-size: 12px !important; }
+          @media print {
+            .cards-row { display: block; }
+            .stage-card { margin-bottom: 15px; page-break-inside: avoid; }
+            .summary-panel { margin-top: 20px; }
+          }
         </style>
       </head>
       <body>
@@ -1142,7 +1053,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
           window.onload = function() {
             setTimeout(() => {
               window.print();
-            }, 500); 
+            }, 600);
           };
         <\/script>
       </body>
