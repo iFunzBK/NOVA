@@ -158,12 +158,19 @@
     overflow-x: auto; 
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    /* เพิ่มบรรทัดนี้เพื่อแก้ไขปัญหาเงาสี่เหลี่ยม */
+    background-image: radial-gradient(600px 250px at 50% -30%, rgba(76,141,255,0.18), transparent 70%);
   }
+  
+  /* ลบ pseudo-element ที่เป็นสาเหตุของปัญหาออก */
+  /*
   .orbit-panel::before { 
     content: ""; position: absolute; inset: 0; 
     background: radial-gradient(600px 250px at 50% -30%, rgba(76,141,255,0.18), transparent 70%); 
     pointer-events: none; border-radius: var(--radius); 
   }
+  */
+
   .orbit-panel::-webkit-scrollbar { height: 6px; }
   .orbit-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; margin: 0 16px; }
   .orbit-panel::-webkit-scrollbar-thumb { background: rgba(127,216,255,0.2); border-radius: 10px; }
@@ -186,7 +193,9 @@
     left: 81px; /* 24px (padding) + 57px (ครึ่งหนึ่งของ 114px node) */
     width: calc(100% - 162px); /* หักล้างซ้ายและขวา (81 * 2) */
     height: 2px; 
-    border-top: 2px dashed rgba(127,216,255,0.4);
+    /* ปรับระยะห่างเส้นประให้พอดี (ขีด 6px, เว้น 8px) ไม่แน่นและไม่ห่างเกินไป */
+    background: repeating-linear-gradient(90deg, rgba(127,216,255,0.4) 0px, rgba(127,216,255,0.4) 6px, transparent 6px, transparent 14px);
+    border: none;
     z-index: 0; 
     pointer-events: none;
   }
